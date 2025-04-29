@@ -16,9 +16,10 @@ export class PluginManager {
             .then((plugins) => {
                 this.plugins = plugins;
                 for (let plugin in this.plugins) {
-                    addPluginActions(plugin, this.plugins[plugin].getPluginActions());
+                    if (this.plugins[plugin]) 
+                        addPluginActions(plugin, this.plugins[plugin].getPluginActions());
                 }
-                console.log("Load plugins:", Object.keys(this.plugins).join(", "));
+                console.log("Load plugins:", Object.keys(this.plugins).filter(key => this.plugins[key] !== null));
             })
             .catch((error) => {
                 console.error("Error importing plugins:", error);

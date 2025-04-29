@@ -22,7 +22,6 @@ import { DeepSeek } from './deepseek.js';
 import { Hyperbolic } from './hyperbolic.js';
 import { GLHF } from './glhf.js';
 import { OpenRouter } from './openrouter.js';
-import { splitContentAndJSON } from '../utils/generation.js';
 
 export class Prompter {
     constructor(agent, fp) {
@@ -340,27 +339,6 @@ export class Prompter {
             }
         }
 
-        if (prompt.includes('$BUILD_BLUEPRINTS')) {
-            if (this.agent.building.blueprints) {
-                let blueprints = '';
-                for (let blueprint in this.agent.building.blueprints) {
-                    blueprints += blueprint + ', ';
-                }
-                if (blueprints.trim().length > 0)
-                    prompt = prompt.replaceAll('$BUILD_BLUEPRINTS', blueprints.slice(0, -2));
-            }
-        }
-        
-        if (prompt.includes('$BUILD_ITEMS')) {
-            if (this.agent.building.blueprints) {
-                let blueprints = '';
-                for (let blueprint in this.agent.building.blueprints) {
-                    blueprints += blueprint + ', ';
-                }
-                if (blueprints.trim().length > 0)
-                    prompt = prompt.replaceAll('$BUILD_BLUEPRINTS', blueprints.slice(0, -2));
-            }
-        }
         // check if there are any remaining placeholders with syntax $<word>
         let remaining = prompt.match(/\$[A-Z_]+/g);
         if (remaining !== null) {
@@ -465,61 +443,5 @@ export class Prompter {
         }
         goal.quantity = parseInt(goal.quantity);
         return goal;
-    }
-
-    async promptBuilding(blueprint, idea) {
-        let items = this.getItemsForBuilding(blueprint);
-        let gen_blueprint = null;
-        let prompt = this.profile.build; 
-        if (prompt && prompt.trim().length > 0) {
-            prompt = prompt.replaceAll("$BUILD_BLUEPRINT", "\n## Reference Blueprint:\n" + JSON.stringify(blueprint.blocks)).replaceAll("$BUILD_IDEA", "## Design Idea:\n" + idea).replaceAll("$BUILD_ITEMS", "## Item Names:\n" + items.join(", "));
-            prompt = await this.replaceStrings(prompt);
-            let generation = await this.chat_model.sendRequest([], prompt);
-            if (generation) {
-                console.log(`Response to blueprint generation: ""${generation}""`);
-                let blocks = this.extractGeneratedBuildingBlocks(generation);
-                if (blocks.length > 0) {
-                    gen_blueprint = {name : blueprint.name, blocks : []};
-                    for (let block of blocks) {
-                        if (Array.isArray(block) && block.length > 3 && block.slice(0, 3).every(Number.isInteger) && items.includes(block[3])) {
-                            gen_blueprint.blocks.push(block);
-                        }
-                    }
-                    if (gen_blueprint.blocks.length < 1) {
-                        this.agent.bot.chat(`I can't generate the blueprint with valid blocks.`);
-                        console.log("No invalid blocks found in the generated blueprint.");
-                    } 
-                } else {
-                    this.agent.bot.chat(`The generated blueprint contains none of blocks.`);
-                    console.log("No blocks extracted from the generation.");
-                }
-            }
-        }
-        return gen_blueprint;
-    }
-    
-    extractGeneratedBuildingBlocks(text) {
-        let [content, data] = splitContentAndJSON(text);
-        let blocks = [];
-        if (data.blocks && Array.isArray(data.blocks)) {
-            blocks = data.blocks;
-        }
-        return blocks 
-    }
-
-    getItemsForBuilding(blueprint) {
-        const buildingBlocks = [
-            "stone", "cobblestone", "stone_bricks", "oak_planks", "spruce_planks",
-            "birch_planks", "dark_oak_planks", "sandstone",
-            "red_sandstone", "bricks", "deepslate_bricks", "quartz_block",
-            "snow_block", "gray_concrete", "white_concrete", "obsidian",
-        ]
-        const buildingItems = [
-            "torch", "ladder", "oak_door", "spruce_door", "glass",
-            "glass_pane", "oak_fence", "spruce_fence", "oak_stairs", "stone_stairs",
-            "cobblestone_stairs", "sandstone_stairs", "brick_stairs", "quartz_stairs",
-            "oak_slab", "stone_slab", "brick_slab", "quartz_slab",
-        ]
-        return buildingBlocks.concat(buildingItems) 
     }
 }

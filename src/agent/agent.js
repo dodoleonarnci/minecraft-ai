@@ -7,7 +7,6 @@ import { initBot } from '../utils/mcdata.js';
 import { containsCommand, commandExists, executeCommand, truncCommandMessage, isAction, blacklistCommands } from './commands/index.js';
 import { ActionManager } from './action_manager.js';
 import { NPCContoller } from './npc/controller.js';
-import { BuildManager } from './build/building.js';
 import { PluginManager } from './plugin.js';
 import { SelfDrivenThinking } from './thinking.js';
 import { MemoryBank } from './memory_bank.js';
@@ -43,8 +42,6 @@ export class Agent {
         this.coder = new Coder(this);
         console.log('Initializing npc controller...');
         this.npc = new NPCContoller(this);
-        console.log('Initializing build manager...');
-        this.building = new BuildManager(this);
         console.log('Initializing plugin manager...');
         this.plugin = new PluginManager(this);
         console.log('Initializing self-driven thinking...');
@@ -464,8 +461,6 @@ export class Agent {
 
         // Init NPC controller
         this.npc.init();
-        // Init build manager 
-        this.building.init();
         // Init self-driven thinking 
         this.thinking.init();
         // Init plugin manager

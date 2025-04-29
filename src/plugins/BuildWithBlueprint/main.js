@@ -1,10 +1,12 @@
 import { Vec3 } from 'vec3';
 import { readdirSync, readFileSync } from 'fs';
-import { ItemGoal } from '../npc/item_goal.js';
-import { itemSatisfied, blockSatisfied, getTypeOfGeneric, rotateXZ} from '../npc/utils.js';
-import * as skills from '../library/skills.js';
-import * as world from '../library/world.js';
+import { join, relative, isAbsolute } from 'path';
+import { ItemGoal } from '../../agent/npc/item_goal.js';
+import { itemSatisfied, blockSatisfied, getTypeOfGeneric, rotateXZ} from '../../agent/npc/utils.js';
+import * as skills from '../../agent/library/skills.js';
+import * as world from '../../agent/library/world.js';
 import * as mc from '../../utils/mcdata.js';
+import { splitContentAndJSON } from '../../utils/generation.js';
 
 class BuildGoal {
     constructor(agent) {
@@ -103,7 +105,8 @@ class BuildGoal {
     }
 
 }
-export class BuildManager {
+
+export class PluginInstance {
     constructor(agent) {
         this.agent = agent;
         this.goals = [];
@@ -112,6 +115,30 @@ export class BuildManager {
         this.item_goal = new ItemGoal(agent);
         this.build_goal = new BuildGoal(agent);
         this.blueprints = {};
+    }
+
+    getPluginActions() {
+        return [
+            {
+                name: '!build',
+                description: this.replaceStrings('Build a structure when there is a proper blueprint for the refenrece. This is preferred if there is a blueprint that is similar to what you want to build, and the name of reference blueprint should be selected from the availabel blueprints. \n$BUILD_BLUEPRINTS'),
+                params: {
+                    'blueprint': { type: 'string', description: 'name of the reference blueprint.' },
+                    'idea': { type: 'string', description: 'a concise description on how to modify a reference blueprint so that buildings sharing the same blueprint can each have distinct, recognizable features.' },
+                },
+                perform: async function (agent, blueprint, idea) {
+                    await agent.plugin.plugins["BuildWithBlueprint"].buildWithIdea(blueprint, idea);
+                }
+            },
+            {
+                name: '!endBuild',
+                description: 'Call when you are satisfied with what you built. It will stop the action if you are building an architecture with a reference blueprint. ',
+                perform: async function () {
+                    this.stop();
+                    return 'Building stopped.';
+                }
+            },
+        ]
     }
 
     getBuiltPositions() {
@@ -134,9 +161,10 @@ export class BuildManager {
 
     init() {
         try {
-            for (let file of readdirSync('src/agent/build/blueprints/')) {
+            const dir = 'src/plugins/BuildWithBlueprint/blueprints/';
+            for (let file of readdirSync(dir)) {
                 if (file.endsWith('.json') && !file.startsWith('.')) {
-                    this.blueprints[file.slice(0, -5)] = JSON.parse(readFileSync('src/agent/build/blueprints/' + file, 'utf8'));
+                    this.blueprints[file.slice(0, -5)] = JSON.parse(readFileSync(join(dir, file), 'utf8'));
                 }
             }
         } catch (e) {
@@ -155,7 +183,13 @@ export class BuildManager {
         });
     }
 
-    async setGoal(name, quantity=1, blueprint=null) {
+    stop() {
+        this.goals = [];
+        this.blueprint = null;
+        this.built = {};
+    }
+
+    async setGoal(name, idea="", quantity=1, blueprint=null) {
         this.stop();
         if (name) {
             let goal = {name: name, quantity: quantity};
@@ -303,7 +337,7 @@ export class BuildManager {
             return 
         }
         console.log("Building with idea: ", name, idea)
-        let blueprint = await this.agent.prompter.promptBuilding(this.blueprints[name], idea);
+        let blueprint = await this.promptBuilding(name, idea);
         if (blueprint.blocks !== undefined && blueprint.blocks.length > 0) {
             console.log(`Generated blueprint to build with:\n${JSON.stringify(blueprint)}`);
             this.setGoal(name, 1, blueprint);
@@ -313,9 +347,94 @@ export class BuildManager {
         }
     }
 
-    stop() {
-        this.goals = [];
-        this.blueprint = null;
-        this.built = {};
+    async promptBuilding(name, idea) {
+        let blueprint = this.blueprints[name];
+        let items = this.getItemsForBuilding(blueprint);
+        let gen_blueprint = null;
+        let prompt = this.agent.prompter.profile.build; 
+        if (!prompt || prompt.trim().length < 1) {
+            prompt = "You are a playful Minecraft bot named $NAME who is good at making building blueprints based on the following reference and a design idea: \n$BUILD_BLUEPRINT\n$BUILD_IDEA\n\nThe result should be formatted in **JSON** dictionary and enclosed in **triple backticks (` ``` ` )**  without labels like \"json\", \"css\", or \"data\".\n- **Do not** generate redundant content other than the result in JSON format.\n- **Do not** use triple backticks anywhere else in your answer.\n- The JSON must include key \"blocks\" whose value is a list of blocks, and for each block, it is also a JSON list including the x, y, z coordinates and item names. \n$BUILD_ITEMS\n\n\nFollowing is an example of the output: \n```{\n \"blocks\" : [\n\t[0, 0, 0, \"planks\"],\n\t[0, 0, 1, \"planks\"],\n\t[1, 0, 1, \"planks\"],\n\t[1, 0, 0, \"planks\"]\n]\n}\n```";
+        }
+        if (prompt && prompt.trim().length > 0) {
+            prompt = this.replaceStrings(prompt, name, idea);
+            prompt = await this.agent.prompter.replaceStrings(prompt);
+            let generation = await this.agent.prompter.chat_model.sendRequest([], prompt);
+            if (generation) {
+                console.log(`Response to blueprint generation: ""${generation}""`);
+                let blocks = this.extractGeneratedBuildingBlocks(generation);
+                if (blocks.length > 0) {
+                    gen_blueprint = {name : blueprint.name, blocks : []};
+                    for (let block of blocks) {
+                        if (Array.isArray(block) && block.length > 3 && block.slice(0, 3).every(Number.isInteger) && items.includes(block[3])) {
+                            gen_blueprint.blocks.push(block);
+                        }
+                    }
+                    if (gen_blueprint.blocks.length < 1) {
+                        this.agent.bot.chat(`I can't generate the blueprint with valid blocks.`);
+                        console.log("No invalid blocks found in the generated blueprint.");
+                    } 
+                } else {
+                    this.agent.bot.chat(`The generated blueprint contains none of blocks.`);
+                    console.log("No blocks extracted from the generation.");
+                }
+            }
+        }
+        return gen_blueprint;
     }
+
+    replaceStrings(prompt, name = '', idea = '') {
+        let blueprint = this.blueprints[name];
+        if (blueprint) {
+            if (prompt.includes('$BUILD_BLUEPRINT')) {
+                prompt = prompt.replaceAll("$BUILD_BLUEPRINT", "\n## Reference Blueprint:\n" + JSON.stringify(blueprint.blocks));
+            }
+        }
+    
+        if (prompt.includes('$BUILD_ITEMS')) {
+            let items = this.getItemsForBuilding(blueprint);
+            prompt = prompt.replaceAll("$BUILD_ITEMS", "## Item Names:\n" + items.join(", "));
+        }
+
+        if (prompt.includes('$BUILD_IDEA')) {
+            prompt = prompt.replaceAll("$BUILD_IDEA", "## Design Idea:\n" + idea);
+        }
+
+        if (prompt.includes('$BUILD_BLUEPRINTS')) {
+            if (this.blueprints) {
+                let blueprints = '';
+                for (let blueprint in this.blueprints) {
+                    blueprints += blueprint + ', ';
+                }
+                if (blueprints.trim().length > 0)
+                    prompt = prompt.replaceAll('$BUILD_BLUEPRINTS', "## Blueprints for Reference:\n" + blueprints.slice(0, -2));
+            }
+        }
+        return prompt
+    }
+    
+    extractGeneratedBuildingBlocks(text) {
+        let [content, data] = splitContentAndJSON(text);
+        let blocks = [];
+        if (data.blocks && Array.isArray(data.blocks)) {
+            blocks = data.blocks;
+        }
+        return blocks 
+    }
+
+    getItemsForBuilding(blueprint) {
+        const buildingBlocks = [
+            "stone", "cobblestone", "stone_bricks", "oak_planks", "spruce_planks",
+            "birch_planks", "dark_oak_planks", "sandstone",
+            "red_sandstone", "bricks", "deepslate_bricks", "quartz_block",
+            "snow_block", "gray_concrete", "white_concrete", "obsidian",
+        ]
+        const buildingItems = [
+            "torch", "ladder", "oak_door", "spruce_door", "glass",
+            "glass_pane", "oak_fence", "spruce_fence", "oak_stairs", "stone_stairs",
+            "cobblestone_stairs", "sandstone_stairs", "brick_stairs", "quartz_stairs",
+            "oak_slab", "stone_slab", "brick_slab", "quartz_slab",
+        ]
+        return buildingBlocks.concat(buildingItems) 
+    }
+
 }
