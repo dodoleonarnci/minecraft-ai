@@ -1,12 +1,12 @@
-# Mindcraft Generative Agents <img src="https://s2.loli.net/2025/04/18/RWaFJkY4gSDLViy.png" alt="Official Discord Server" width="36" height="36"> 
+# Mindcraft AI <img src="https://s2.loli.net/2025/04/18/RWaFJkY4gSDLViy.png" alt="Official Discord Server" width="36" height="36"> 
 
-**Mindcraft Generative Agents** is an extension of the [Mindcraft](https://github.com/kolbytn/mindcraft) and integrates the core concepts of [Generative Agents](https://github.com/joonspk-research/generative_agents)—such as autonomous planning, self-reflection, self-driven behavior, and long-term goal pursuit—into an interactive Minecraft environment. Rather than introducing a separate memory system, the project leverages Mindcraft’s existing memory infrastructure, enhancing it with dynamic agent profiles, daily self-generated task lists, and reflective behaviors. Agents can interact, plan, and evolve over time based on their profile and experiences, enabling a lightweight yet powerful simulation of human-like behavior.
+**Minecraft AI** is a project derived from [Mindcraft](https://github.com/kolbytn/mindcraft), building upon the foundational ideas of [Generative Agents](https://github.com/joonspk-research/generative_agents)—including autonomous planning, self-reflection, self-motivated behavior, and long-term goal pursuit—within an interactive Minecraft environment. Instead of creating a new memory system from scratch, the project refactors and extends Mindcraft’s original memory infrastructure, introducing dynamic agent profiles, daily self-generated task lists, and reflective behavior cycles. These enhancements allow agents to interact, plan, and adapt over time based on their experiences and identity, resulting in a lightweight yet compelling simulation of human-like cognition and social dynamics.
 
 🦾 This project is currently in development. We are continuously adding and optimizing more functions. If you have any questions, you're welcome to join our Discord server for further discussions!
 
 <a href="https://discord.gg/RKjspnTBmb" target="_blank"><img src="https://s2.loli.net/2025/04/18/CEjdFuZYA4pKsQD.png" alt="Official Discord Server" width="180" height="36"></a>
 
-The **setup process** of Minecraft Generative Agents is the same as that of [Mindcraft](https://github.com/kolbytn/mindcraft). However, there are some significant features you should be aware of.
+The **setup process** of Minecraft AI is the same as that of [Mindcraft](https://github.com/kolbytn/mindcraft). However, there are some significant features you should be aware of.
 
 ## Notable Features
 
@@ -159,7 +159,7 @@ To use the TTS via API function, you need to set "speak" to `true` in the `setti
 }
 ```
 
-Since our Minecraft Generative Agents project allows you to send messages to all bots at once, enabling TTS with multiple bots online may result in a large number of voices speaking simultaneously. To address this, we have added a parameter "speak_agents" to the `settings.json` file. When this parameter is set and a list of bot names is provided, only the bots in the list will speak.
+Since our Minecraft AI  project allows you to send messages to all bots at once, enabling TTS with multiple bots online may result in a large number of voices speaking simultaneously. To address this, we have added a parameter "speak_agents" to the `settings.json` file. When this parameter is set and a list of bot names is provided, only the bots in the list will speak.
 
 ```json
 "speak": true, 
@@ -217,6 +217,6 @@ Plugins are only loaded if their names are explicitly listed in the settings.plu
 
 ### Memory Module
 
-The memory module has been modularized (in `src/agent/memory.js`)and refactored to support flexible memory management while maintaining compatibility with the original mindcraft-generative-agents memory interface.
+The memory module has been modularized (in `src/agent/memory.js`)and refactored to support flexible memory management while maintaining compatibility with the original Mindcraft memory interface.
 
 This new structure enables the agent to handle the stuff about memory management without touching other parts of the framework, and provides a solid foundation for experimenting with more advanced, "consciousness-like" memory models.
