@@ -196,3 +196,27 @@ You can customize the agent’s personality and intrinsic goals by configuring t
 ```
 
 <img src="https://s2.loli.net/2025/04/20/wWpoAE9xe6rcQ7f.gif" alt="Bot build a igloo after self-driven thinking." width="800" height="450">
+
+### Support for Plugins (PR to Mindcraft)
+
+We added a new module, PluginManager (src/agent/plugin.js), which enables dynamic loading of modular agent plugins. It searches the src/plugins directory and loads plugins based on the current configuration. With plugins, we can extend the available actions dynamically, which reduce the pressure for putting long `CommandDoc` into the always limited LLM context. 
+
+#### Plugin Structure
+
+Each plugin should reside in its own subdirectory under src/plugins. The name of the directory will be used as the plugin’s identifier. For example, the folder src/plugins/Dance/ corresponds to a plugin named "Dance".
+
+A valid plugin must include a main.js file that exports a PluginInstance class. When the PluginManager loads the plugin, it instantiates this class and calls its init() method for initialization.
+
+In addition, the PluginInstance must implement a method called getPluginActions(), which returns a list of action definitions. These actions will be appended to the global action list in src/agent/commands/actions.js.
+
+You can refer to src/plugins/Dance for an example implementation.
+
+#### Enabling Plugins
+
+Plugins are only loaded if their names are explicitly listed in the settings.plugins array. If the plugin name is not included, it will be ignored.
+
+### Memory Module
+
+The memory module has been modularized (in `src/agent/memory.js`)and refactored to support flexible memory management while maintaining compatibility with the original mindcraft-generative-agents memory interface.
+
+This new structure enables the agent to handle the stuff about memory management without touching other parts of the framework, and provides a solid foundation for experimenting with more advanced, "consciousness-like" memory models.
