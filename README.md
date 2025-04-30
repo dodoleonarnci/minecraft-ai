@@ -18,6 +18,8 @@ The **setup process** of Minecraft AI is the same as that of [Mindcraft](https:/
 - [Set Skin with Local Files](#set-skin-with-local-files)
 - [Interaction in Natural Voice](#interaction-in-natural-voice)
 - [Implementation of Generative Agents](#implementation-of-generative-agents)
+- [Support for Plugins](#support-for-plugins-pr-to-mindcraft) 
+- [Memory Module](#memory-module)
 
 ### Profile of Bots
 
