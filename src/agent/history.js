@@ -1,6 +1,7 @@
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
 import { NPCData } from './npc/data.js';
 import settings from '../../settings.js';
+import {Memory} from './memory.js';
 
 
 export class History {
@@ -15,7 +16,9 @@ export class History {
         this.turns = [];
 
         // Natural language memory as a summary of recent messages + previous memory
-        this.memory = '';
+        // this.memory = '';
+        // Abstract memory object 
+        this.memory = new Memory(agent);
 
         // Maximum number of messages to keep in context before saving chunk to memory
         this.max_messages = settings.max_messages;
@@ -28,18 +31,6 @@ export class History {
 
     getHistory() { // expects an Examples object
         return JSON.parse(JSON.stringify(this.turns));
-    }
-
-    async summarizeMemories(turns) {
-        console.log("Storing memories...");
-        this.memory = await this.agent.prompter.promptMemSaving(turns);
-
-        if (this.memory.length > 500) {
-            this.memory = this.memory.slice(0, 500);
-            this.memory += '...(Memory truncated to 500 chars. Compress it more next time)';
-        }
-
-        console.log("Memory updated to: ", this.memory);
     }
 
     async appendFullHistory(to_store) {
@@ -74,7 +65,7 @@ export class History {
             while (this.turns.length > 0 && this.turns[0].role === 'assistant')
                 chunk.push(this.turns.shift()); // remove until turns starts with system/user message
 
-            await this.summarizeMemories(chunk);
+            await this.memory.update({history : chunk});
             await this.appendFullHistory(chunk);
         }
     }
@@ -82,7 +73,7 @@ export class History {
     async save() {
         try {
             const data = {
-                memory: this.memory,
+                memory: this.memory.get(),
                 turns: this.turns,
                 self_prompting_state: this.agent.self_prompter.state,
                 self_prompt: this.agent.self_prompter.isStopped() ? null : this.agent.self_prompter.prompt,
@@ -103,7 +94,7 @@ export class History {
                 return null;
             }
             const data = JSON.parse(readFileSync(this.memory_fp, 'utf8'));
-            this.memory = data.memory || '';
+            this.memory.set({raw : data.memory || ''});
             this.turns = data.turns || [];
             console.log('Loaded memory:', this.memory);
             return data;
@@ -115,6 +106,6 @@ export class History {
 
     clear() {
         this.turns = [];
-        this.memory = '';
+        this.memory.clear();
     }
 }

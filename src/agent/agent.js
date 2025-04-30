@@ -89,10 +89,6 @@ export class Agent {
         });
 
         this.bot.on('change_suit', () =>{
-            // let suit = choose(["batman_white", "batman", "batman_blue", "batman_pink", "batman_gray"])[0];
-            // let command = `/skin set upload classic /Users/nil/Projects/mindcraft-generative-agents/skins/ironman.png`;
-            // console.log(command);
-            // this.bot.chat(command);
         })
 
         const spawnTimeout = setTimeout(() => {
