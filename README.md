@@ -1,5 +1,9 @@
 # Mindcraft AI <img src="https://s2.loli.net/2025/04/18/RWaFJkY4gSDLViy.png" alt="Official Discord Server" width="36" height="36"> 
 
+Minecraft AI explores how AI Characters (AICs) can become creative, expressive, and socially responsive agents inside Minecraft. More than just NPCs, these agents can dance, sing, build, and chat—reacting to the world and to players with surprising depth and personality. By combining large language models with an open-ended sandbox environment, this project reimagines Minecraft as a playground for human–AI co-creation.
+
+**The Embodied Turing Test** Rather than asking "Can machines think?", Minecraft AI invites a new question for the generative AI era: Can machines play with us? Through open-ended interaction, emergent behaviors, and shared creativity, we explore whether AI can truly engage as a companion—not just in conversation, but in fun, imagination, and collaborative world-building.
+
 **Minecraft AI** is a project derived from [Mindcraft](https://github.com/kolbytn/mindcraft), building upon the foundational ideas of [Generative Agents](https://github.com/joonspk-research/generative_agents)—including autonomous planning, self-reflection, self-motivated behavior, and long-term goal pursuit—within an interactive Minecraft environment. Instead of creating a new memory system from scratch, the project refactors and extends Mindcraft’s original memory infrastructure, introducing dynamic agent profiles, daily self-generated task lists, and reflective behavior cycles. These enhancements allow agents to interact, plan, and adapt over time based on their experiences and identity, resulting in a lightweight yet compelling simulation of human-like cognition and social dynamics.
 
 🦾 This project is currently in development. We are continuously adding and optimizing more functions. If you have any questions, you're welcome to join our Discord server for further discussions!
@@ -197,7 +201,7 @@ You can customize the agent’s personality and intrinsic goals by configuring t
 }
 ```
 
-<img src="https://s2.loli.net/2025/04/20/wWpoAE9xe6rcQ7f.gif" alt="Bot build a igloo after self-driven thinking." width="800" height="450">
+<img src="https://s2.loli.net/2025/04/20/wWpoAE9xe6rcQ7f.gif" alt="AIC build a igloo after self-driven thinking." width="800" height="450">
 
 ### Support for Plugins (PR to Mindcraft)
 
@@ -217,8 +221,24 @@ You can refer to src/plugins/Dance for an example implementation.
 
 Plugins are only loaded if their names are explicitly listed in the settings.plugins array. If the plugin name is not included, it will be ignored.
 
+<img src="https://s2.loli.net/2025/05/01/9coFA2KhjVipYQZ.gif" alt="AIC dance with the example Dance plugin." width="800" height="450">
+
 ### Memory Module
 
 The memory module has been modularized (in `src/agent/memory.js`)and refactored to support flexible memory management while maintaining compatibility with the original Mindcraft memory interface.
 
 This new structure enables the agent to handle the stuff about memory management without touching other parts of the framework, and provides a solid foundation for experimenting with more advanced, "consciousness-like" memory models.
+
+## Documentation
+
+More detailed information of MineMCP can be found in the [Documentation](https://github.com/aeromechanic000/minecraft-ai/tree/main/doc).
+
+## Citation
+```
+@misc{minecraft_ai_2025,
+    Author = {Minecraft AI},
+    Title = {Minecraft AI: Toward Embodied Turing Test Through AI Characters},
+    Year = {2025},
+    url={https://github.com/aeromechanic000/minecraft-ai}
+}
+```
