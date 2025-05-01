@@ -10,6 +10,17 @@ Minecraft AI explores how AI Characters (AICs) can become creative, expressive, 
 
 <a href="https://discord.gg/RKjspnTBmb" target="_blank"><img src="https://s2.loli.net/2025/04/18/CEjdFuZYA4pKsQD.png" alt="Official Discord Server" width="180" height="36"></a>
 
+## Playing Showcases 
+
+<table>
+<tr>
+<td><a href="https://www.youtube.com/watch?v=lI5VubK_eHs" target="_blank"><img src="https://s2.loli.net/2025/05/01/KcO4AXGhmwH7Z2v.png" alt="Minecraft Meets AI Dance Party" width="250" height="150"></a></td>
+<td><a href="https://www.youtube.com/watch?v=xGs_TPBtwKw" target="_blank"><img src="https://s2.loli.net/2025/05/01/kLC1UuOHpgtTjs7.png" alt="Emergent Behavior of Minecraft AIC" width="250" height="150"></a></td>
+</tr>
+</table>
+
+## Quick Start 
+
 The **setup process** of Minecraft AI is the same as that of [Mindcraft](https://github.com/kolbytn/mindcraft). However, there are some significant features you should be aware of.
 
 ## Notable Features
