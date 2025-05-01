@@ -1,4 +1,4 @@
-# Mindcraft AI <img src="https://s2.loli.net/2025/04/18/RWaFJkY4gSDLViy.png" alt="Official Discord Server" width="36" height="36"> 
+# <img src="https://s2.loli.net/2025/04/18/RWaFJkY4gSDLViy.png" alt="Official Discord Server" width="36" height="36"> Minecraft AI 
 
 Minecraft AI explores how AI Characters (AICs) can become creative, expressive, and socially responsive agents inside Minecraft. More than just NPCs, these agents can dance, sing, build, and chat—reacting to the world and to players with surprising depth and personality. By combining large language models with an open-ended sandbox environment, this project reimagines Minecraft as a playground for human–AI co-creation.
 
@@ -96,6 +96,8 @@ In Mindcraft, when multiple bots are online, you have to use the "whisper" funct
 ```
 @all come here
 ```
+
+You can also `@` a AIC to send a whisper message. That is `@Dobson Hi` can be used as an alternative to `/msg Dobson Hi`.
 
 ### Set Skin with Local Files
 
@@ -205,7 +207,7 @@ You can customize the agent’s personality and intrinsic goals by configuring t
 
 ### Support for Plugins (PR to Mindcraft)
 
-We added a new module, PluginManager (src/agent/plugin.js), which enables dynamic loading of modular agent plugins. It searches the src/plugins directory and loads plugins based on the current configuration. With plugins, we can extend the available actions dynamically, which reduce the pressure for putting long `CommandDoc` into the always limited LLM context. 
+We added a new module, PluginManager (src/agent/plugin.js), which enables dynamic loading of modular agent plugins. It searches the src/plugins directory and loads plugins based on the current configuration. With plugins, we can extend the available actions dynamically, which reduce the pressure for putting long `COMMAND_DOCS` into the always limited LLM context. 
 
 #### Plugin Structure
 
@@ -221,7 +223,7 @@ You can refer to src/plugins/Dance for an example implementation.
 
 Plugins are only loaded if their names are explicitly listed in the settings.plugins array. If the plugin name is not included, it will be ignored.
 
-<img src="https://s2.loli.net/2025/05/01/9coFA2KhjVipYQZ.gif" alt="AIC dance with the example Dance plugin." width="800" height="450">
+<img src="https://s2.loli.net/2025/05/01/BNLAIKhpsiC5naU.gif" alt="AIC dance with the example Dance plugin." width="800" height="450">
 
 ### Memory Module
 
@@ -231,7 +233,7 @@ This new structure enables the agent to handle the stuff about memory management
 
 ## Documentation
 
-More detailed information of MineMCP can be found in the [Documentation](https://github.com/aeromechanic000/minecraft-ai/tree/main/doc).
+More detailed information of Minecraft AI can be found in the [Documentation](https://github.com/aeromechanic000/minecraft-ai/tree/main/doc).
 
 ## Citation
 ```
