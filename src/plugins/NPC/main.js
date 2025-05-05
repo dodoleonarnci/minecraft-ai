@@ -2,12 +2,12 @@ import { readdirSync, readFileSync } from 'fs';
 import { NPCData } from './data.js';
 import { ItemGoal } from './item_goal.js';
 import { BuildGoal } from './build_goal.js';
-import { itemSatisfied, rotateXZ } from './utils.js';
-import * as skills from '../library/skills.js';
-import * as world from '../library/world.js';
+import * as skills from '../../agent/library/skills.js';
+import * as world from '../../agent/library/world.js';
 import * as mc from '../../utils/mcdata.js';
+import { itemSatisfied, rotateXZ } from '../../utils/build.js';
 
-export class NPCContoller {
+export class PluginInstance {
     constructor(agent) {
         this.agent = agent;
         this.data = NPCData.fromObject(agent.prompter.profile.npc);
@@ -18,30 +18,12 @@ export class NPCContoller {
         this.last_goals = {};
     }
 
-    getBuiltPositions() {
-        let positions = [];
-        for (let name in this.data.built) {
-            let position = this.data.built[name].position;
-            let offset = this.constructions[name].offset;
-            let sizex = this.constructions[name].blocks[0][0].length;
-            let sizez = this.constructions[name].blocks[0].length;
-            let sizey = this.constructions[name].blocks.length;
-            for (let y = offset; y < sizey+offset; y++) {
-                for (let z = 0; z < sizez; z++) {
-                    for (let x = 0; x < sizex; x++) {
-                        positions.push({x: position.x + x, y: position.y + y, z: position.z + z});
-                    }
-                }
-            }
-        }
-        return positions;
-    }
-
     init() {
         try {
-            for (let file of readdirSync('src/agent/npc/construction')) {
+            let dir = 'src/plugins/NPC/construction/';
+            for (let file of readdirSync(dir)) {
                 if (file.endsWith('.json')) {
-                    this.constructions[file.slice(0, -5)] = JSON.parse(readFileSync('src/agent/npc/construction/' + file, 'utf8'));
+                    this.constructions[file.slice(0, -5)] = JSON.parse(readFileSync(dir + file, 'utf8'));
                 }
             }
         } catch (e) {
@@ -78,6 +60,28 @@ export class NPCContoller {
         });
     }
 
+    getPluginActions() {
+        return [];
+    }
+
+    getBuiltPositions() {
+        let positions = [];
+        for (let name in this.data.built) {
+            let position = this.data.built[name].position;
+            let offset = this.constructions[name].offset;
+            let sizex = this.constructions[name].blocks[0][0].length;
+            let sizez = this.constructions[name].blocks[0].length;
+            let sizey = this.constructions[name].blocks.length;
+            for (let y = offset; y < sizey+offset; y++) {
+                for (let z = 0; z < sizez; z++) {
+                    for (let x = 0; x < sizex; x++) {
+                        positions.push({x: position.x + x, y: position.y + y, z: position.z + z});
+                    }
+                }
+            }
+        }
+        return positions;
+    }
     async setGoal(name=null, quantity=1) {
         this.data.curr_goal = null;
         this.last_goals = {};
@@ -92,13 +96,39 @@ export class NPCContoller {
         for (let goal in this.data.goals) {
             if (past_goals[goal.name] === undefined) past_goals[goal.name] = true;
         }
-        let res = await this.agent.prompter.promptGoalSetting(this.agent.history.getHistory(), past_goals);
+        let res = await this.promptGoalSetting(this.agent.history.getHistory(), past_goals);
         if (res) {
             this.data.curr_goal = res;
             console.log('Set new goal: ', res.name, ' x', res.quantity);
         } else {
             console.log('Error setting new goal.');
         }
+    }
+    
+    async promptGoalSetting(messages, last_goals) {
+        let system_message = ""; 
+        system_message = await this.agent.prompter.replaceStrings(system_message, messages);
+
+        let user_message = 'Use the below info to determine what goal to target next\n\n';
+        user_message += '$LAST_GOALS\n$STATS\n$INVENTORY\n$CONVO'
+        user_message = await this.agent.prompter.replaceStrings(user_message, messages, null, null, last_goals);
+        let user_messages = [{role: 'user', content: user_message}];
+
+        let res = await this.agent.prompter.chat_model.sendRequest(user_messages, system_message);
+
+        let goal = null;
+        try {
+            let data = res.split('```')[1].replace('json', '').trim();
+            goal = JSON.parse(data);
+        } catch (err) {
+            console.log('Failed to parse goal:', res, err);
+        }
+        if (!goal || !goal.name || !goal.quantity || isNaN(parseInt(goal.quantity))) {
+            console.log('Failed to set goal:', res);
+            return null;
+        }
+        goal.quantity = parseInt(goal.quantity);
+        return goal;
     }
 
     async executeNext() {
@@ -220,5 +250,41 @@ export class NPCContoller {
             }
         }
         return null;
+    }
+
+    getBuildingDoor(name) {
+        if (name === null || this.data.built[name] === undefined) return null;
+        let door_x = null;
+        let door_z = null;
+        let door_y = null;
+        for (let y = 0; y < this.constructions[name].blocks.length; y++) {
+            for (let z = 0; z < this.constructions[name].blocks[y].length; z++) {
+                for (let x = 0; x < this.constructions[name].blocks[y][z].length; x++) {
+                    if (this.constructions[name].blocks[y][z][x] !== null &&
+                        this.constructions[name].blocks[y][z][x].includes('door')) {
+                        door_x = x;
+                        door_z = z;
+                        door_y = y;
+                        break;
+                    }
+                }
+                if (door_x !== null) break;
+            }
+            if (door_x !== null) break;
+        }
+        if (door_x === null) return null;
+
+        let sizex = this.constructions[name].blocks[0][0].length;
+        let sizez = this.constructions[name].blocks[0].length;
+        let orientation = 4 - this.data.built[name].orientation; // this conversion is opposite
+        if (orientation == 4) orientation = 0;
+        [door_x, door_z] = rotateXZ(door_x, door_z, orientation, sizex, sizez);
+        door_y += this.constructions[name].offset;
+
+        return {
+            x: this.data.built[name].position.x + door_x,
+            y: this.data.built[name].position.y + door_y,
+            z: this.data.built[name].position.z + door_z
+        };
     }
 }

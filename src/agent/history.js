@@ -1,5 +1,4 @@
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
-import { NPCData } from './npc/data.js';
 import settings from '../../settings.js';
 import {Memory} from './memory.js';
 
@@ -15,8 +14,6 @@ export class History {
 
         this.turns = [];
 
-        // Natural language memory as a summary of recent messages + previous memory
-        // this.memory = '';
         // Abstract memory object 
         this.memory = new Memory(agent);
 
@@ -96,7 +93,7 @@ export class History {
             const data = JSON.parse(readFileSync(this.memory_fp, 'utf8'));
             this.memory.set({raw : data.memory || ''});
             this.turns = data.turns || [];
-            console.log('Loaded memory:', this.memory);
+            console.log('Loaded memory:', this.memory.get());
             return data;
         } catch (error) {
             console.error('Failed to load history:', error);

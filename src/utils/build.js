@@ -1,5 +1,5 @@
-import * as world from '../library/world.js';
-import * as mc from '../../utils/mcdata.js';
+import * as world from '../agent/library/world.js';
+import * as mc from './mcdata.js';
 
 
 export function getTypeOfGeneric(bot, block_name) {
@@ -69,8 +69,7 @@ export function getTypeOfGeneric(bot, block_name) {
     return block_name;
 }
 
-
-export function blockSatisfied(target_name, block) {
+export function blockSatisfied(target_name, block, relax = 0) {
     if (target_name == 'dirt') {
         return block.name == 'dirt' || block.name == 'grass_block';
     } else if (mc.MATCHING_WOOD_BLOCKS.includes(target_name)) {
@@ -82,7 +81,6 @@ export function blockSatisfied(target_name, block) {
     }
     return block.name == target_name;
 }
-
 
 export function itemSatisfied(bot, item, quantity=1) {
     let qualifying = [item];

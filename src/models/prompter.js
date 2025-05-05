@@ -249,29 +249,30 @@ export class Prompter {
     async replaceStrings(prompt, messages, examples=null, to_summarize=[], last_goals=null) {
         prompt = prompt.replaceAll('$NAME', this.agent.name);
         
-        if (this.profile.reflection_interval && !this.profile.thinking_interval) {
-            if (prompt.includes('$PERSON')) {
-                if (this.profile.person_desc && this.profile.person_desc.trim().length > 0) {
-                    prompt = prompt.replaceAll('$PERSON', this.profile.person_desc);
-                } else {
-                    prompt = prompt.replaceAll('$PERSON', "");
-                }
+        if (prompt.includes('$PERSON_DESC')) {
+            if (this.profile.person_desc && this.profile.person_desc.trim().length > 0) {
+                prompt = prompt.replaceAll('$PERSON_DESC', this.profile.person_desc);
+            } else {
+                prompt = prompt.replaceAll('$PERSON_DESC', "");
             }
-            if (prompt.includes('$LONGTERM')) {
-                if (this.profile.longterm_thinking && this.profile.longterm_thinking.trim().length > 0) {
-                    prompt = prompt.replaceAll('$LONGTERM', "## Long-Term Thiking:\n" + this.profile.longterm_thinking);
-                } else {
-                    prompt = prompt.replaceAll('$LONGTERM', "");
-                }
+        }
+
+        if (prompt.includes('$LONGTERM')) {
+            if (this.profile.longterm_thinking && this.profile.longterm_thinking.trim().length > 0) {
+                prompt = prompt.replaceAll('$LONGTERM', "## Long-Term Thiking:\n" + this.profile.longterm_thinking);
+            } else {
+                prompt = prompt.replaceAll('$LONGTERM', "");
             }
-            if (prompt.includes('$SHORTTERM')) {
-                if (this.profile.shortterm_thinking && this.profile.shortterm_thinking.trim().length > 0) {
-                    prompt = prompt.replaceAll('$SHORTTERM', "## Short-Term Thiking:\n" + this.profile.shortterm_thinking);
-                } else {
-                    prompt = prompt.replaceAll('$SHORTTERM', "");
-                }
+        }
+
+        if (prompt.includes('$SHORTTERM')) {
+            if (this.profile.shortterm_thinking && this.profile.shortterm_thinking.trim().length > 0) {
+                prompt = prompt.replaceAll('$SHORTTERM', "## Short-Term Thiking:\n" + this.profile.shortterm_thinking);
+            } else {
+                prompt = prompt.replaceAll('$SHORTTERM', "");
             }
-        } 
+        }
+
         if (prompt.includes('$TODO')) {
             if (this.agent.thinking.todo_list.length > 0) {
                 let todo_list = "-" + this.agent.thinking.todo_list.join("\n-"); 
@@ -414,36 +415,5 @@ export class Prompter {
         return res.trim().toLowerCase() === 'respond';
     }
 
-    async promptVision(messages, imageBuffer) {
-        await this.checkCooldown();
-        let prompt = this.profile.image_analysis;
-        prompt = await this.replaceStrings(prompt, messages, null, null, null);
-        return await this.vision_model.sendVisionRequest(messages, prompt, imageBuffer);
-    }
-
-    async promptGoalSetting(messages, last_goals) {
-        let system_message = this.profile.goal_setting;
-        system_message = await this.replaceStrings(system_message, messages);
-
-        let user_message = 'Use the below info to determine what goal to target next\n\n';
-        user_message += '$LAST_GOALS\n$STATS\n$INVENTORY\n$CONVO'
-        user_message = await this.replaceStrings(user_message, messages, null, null, last_goals);
-        let user_messages = [{role: 'user', content: user_message}];
-
-        let res = await this.chat_model.sendRequest(user_messages, system_message);
-
-        let goal = null;
-        try {
-            let data = res.split('```')[1].replace('json', '').trim();
-            goal = JSON.parse(data);
-        } catch (err) {
-            console.log('Failed to parse goal:', res, err);
-        }
-        if (!goal || !goal.name || !goal.quantity || isNaN(parseInt(goal.quantity))) {
-            console.log('Failed to set goal:', res);
-            return null;
-        }
-        goal.quantity = parseInt(goal.quantity);
-        return goal;
-    }
+    
 }

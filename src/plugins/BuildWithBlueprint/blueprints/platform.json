@@ -1,5 +1,5 @@
 {
-    "name": "stone_platform",
+    "name": "platform",
     "blocks": [
         [1, 0, 1, "stone"], 
         [1, 0, 2, "stone"], 

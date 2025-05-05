@@ -16,8 +16,9 @@ export class PluginManager {
             .then((plugins) => {
                 this.plugins = plugins;
                 for (let plugin in this.plugins) {
-                    if (this.plugins[plugin]) 
+                    if (this.plugins[plugin]) {
                         addPluginActions(plugin, this.plugins[plugin].getPluginActions());
+                    }
                 }
                 console.log("Loaded plugins:", Object.keys(this.plugins).filter(key => this.plugins[key] !== null));
             })

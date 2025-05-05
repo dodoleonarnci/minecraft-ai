@@ -1,110 +1,13 @@
 import { Vec3 } from 'vec3';
 import { readdirSync, readFileSync } from 'fs';
 import { join, relative, isAbsolute } from 'path';
-import { ItemGoal } from '../../agent/npc/item_goal.js';
-import { itemSatisfied, blockSatisfied, getTypeOfGeneric, rotateXZ} from '../../agent/npc/utils.js';
 import * as skills from '../../agent/library/skills.js';
 import * as world from '../../agent/library/world.js';
 import * as mc from '../../utils/mcdata.js';
+import { itemSatisfied} from '../../utils/build.js';
 import { splitContentAndJSON } from '../../utils/generation.js';
-
-class BuildGoal {
-    constructor(agent) {
-        this.agent = agent;
-    }
-
-    async executeNext(blueprint, built) {
-        let position = built.position
-        let missing = {};
-        let finished = false;
-        let failed = false;
-        let error = null;
-
-        if (!position) {
-            let [min_x, max_x, min_z, max_z] = [0, 0, 0, 0];
-            for (let block of blueprint.blocks) {
-                if (block[1] !== 0) continue;
-                min_x = Math.min(min_x, block[0]);    
-                max_x = Math.min(max_x, block[0]);    
-                min_z = Math.min(min_z, block[0]);    
-                max_z = Math.min(max_z, block[0]);    
-            }
-
-            let size = Math.max(max_x - min_x, max_z - min_z);
-            position = world.getNearestFreeSpace(this.agent.bot, size, 32);
-        }
-
-        if (!position) {
-            failed = true; 
-            error = `I can't find a free space to build ${goal.name}.`;
-        } else {
-            let inventory = world.getInventoryCounts(this.agent.bot);
-            let satisfied = 0;
-            let added = 0;
-            for (let block of blueprint.blocks) {
-                try {
-                    let block_name = block[3];
-                    if (block_name === null || block_name === '') continue;
-                    const world_pos = new Vec3(position.x + block[0], position.y + block[1], position.z + block[2]);
-                    let current_block = this.agent.bot.blockAt(world_pos);
-
-                    if (current_block !== null) {
-                        if (blockSatisfied(block_name, current_block)) {
-                            satisfied++;
-                            continue;
-                        } 
-                        
-                        if (current_block.name !== 'air') {
-                            console.log("Need to break block: ", current_block.name)
-                            let res = await this.agent.actions.runAction('build:BuildGoal', async () => {
-                                await skills.breakBlockAt(this.agent.bot, world_pos.x, world_pos.y, world_pos.z);
-                            })
-                            if (!res) {
-                                failed = true;
-                                error = `Interupted in breaking block ${block_name} at ${world_pos.x}, ${world_pos.y}, ${world_pos.z}`;
-                                break;
-                            }
-                        }
-
-                        console.log("Place block: ", block_name)
-                        let block_typed = getTypeOfGeneric(this.agent.bot, block_name);
-                        if (inventory[block_typed] > 0) {
-                            let res = await this.agent.actions.runAction('build:BuildGoal', async () => {
-                                await skills.placeBlock(this.agent.bot, block_typed, world_pos.x, world_pos.y, world_pos.z);
-                            })
-                            if (!res) {
-                                failed = true;
-                                error = `Interupted when placing ${block_name} at ${world_pos.x}, ${world_pos.y}, ${world_pos.z}`;
-                                break;
-                            }
-                        } else {
-                            if (missing[block_typed] === undefined)
-                                missing[block_typed] = 0;
-                            missing[block_typed]++;
-                        }
-
-                        current_block = this.agent.bot.blockAt(world_pos);
-                        if (blockSatisfied(block_name, current_block)) {
-                            added++;
-                        }
-                    }
-                } catch (e) {
-                    console.log(`Error in placing ${block[3]} at ${world_pos.x}, ${world_pos.y}, ${world_pos.z}: `, e);
-                    continue
-                }
-            }
-            if (satisfied === blueprint.blocks.length) {
-                finished = true;
-            } else if (added < 1 && Object.keys(missing).length < 1) {
-                failed = true;
-                error = `I can't finish building the complete version of ${blueprint.name}.`;
-            }
-        }
-
-        return {position, finished, missing, failed, error};
-    }
-
-}
+import { ItemGoal } from './item_goal.js';
+import { BuildGoal } from './build_goal.js';
 
 export class PluginInstance {
     constructor(agent) {
@@ -177,7 +80,7 @@ export class PluginInstance {
             await new Promise((resolve) => setTimeout(resolve, 5000));
             // Persue goal
             if (!this.agent.actions.resume_func) {
-                this.executeNext();
+                await this.executeNext();
                 this.agent.history.save();
             }
         });
@@ -189,7 +92,7 @@ export class PluginInstance {
         this.built = {};
     }
 
-    async setGoal(name, idea="", quantity=1, blueprint=null) {
+    async setGoal(name, quantity=1, idea="", blueprint=null) {
         this.stop();
         if (name) {
             let goal = {name: name, quantity: quantity};
@@ -198,7 +101,16 @@ export class PluginInstance {
             else if (this.blueprints[name] !== undefined)
                 this.blueprint = this.blueprints[name];
             
-            this.blueprint.blocks.sort((a, b) => {a[1] - b[1]});
+            this.blueprint.blocks.sort((a, b) => {
+                if (a[1] === b[1]) {
+                    if (a[0] === b[0]) {
+                        return a[2] - b[2];
+                    } else {
+                        return a[0] - b[0];
+                    }
+                }
+                return a[1] - b[1];
+            });
             this.goals.push(goal);
             console.log('Set new building goal: ', name, ' x', quantity, ' with blueprint: ', this.blueprint);
             this.agent.bot.emit('idle');
@@ -276,53 +188,55 @@ export class PluginInstance {
 
     async executeGoal() {
         console.log("Executing goals: ", this.goals);
-        if (this.goals.length > 0) {
-            let goal = this.goals[0];
-            try {
-                if (!this.blueprints[goal.name]) {
-                    console.log(`Item goal: ${goal.name} x ${goal.quantity}.`);
-                    if (this.agent.bot.game.gameMode === "creative") 
-                        this.agent.bot.chat(`/give ${this.agent.name} ${goal.name} ${goal.quantity}`)
-                        await new Promise((resolve) => setTimeout(resolve, 3000));
-                    if (!itemSatisfied(this.agent.bot, goal.name, goal.quantity)) {
-                        let res = await this.item_goal.executeNext(goal.name, goal.quantity);
-                        if (!res) {
-                            this.agent.bot.chat(`I can't build ${this.goals[-1].name}, as stuck when get ${goal.name} x ${goal.quantity}.`);
-                            this.stop();
-                        }
-                    }
-                    if (this.goals.length > 0) {
-                        this.goals.shift();
-                    }
-                } else {
-                    console.log(`Build goal: ${goal.name} x ${goal.quantity}.`);
-                    let res = await this.build_goal.executeNext(this.blueprint, this.built)
-                    for (let block_name in res.missing) {
-                        this.goals.unshift({
-                            name: block_name,
-                            quantity: res.missing[block_name]
-                        })
-                    }
-
-                    if (res.failed) {
-                        this.agent.bot.chat(res.error);
-                        this.stop();
-                    } else {
-                        this.built.position = res.position;
-                    }
-
-                    if (res.finished) {
-                        if (this.goals.length > 0) {
-                            this.goals.shift();
-                        }
-                    } 
-                }
-            } catch (e) {
-                console.log("Error in executing building goal: ", e);
-                this.agent.bot.chat(`I can't build ${goal.name} right now.`);
-                this.stop();
-            }
+        if (this.goals.length < 1) {
+            this.stop();
+            return;
         }
+        let goal = this.goals[0];
+        try {
+            if (!this.blueprints[goal.name]) {
+                console.log(`Item goal: ${goal.name} x ${goal.quantity}.`);
+                if (this.agent.bot.game.gameMode === "creative") {
+                    this.agent.bot.chat(`/give ${this.agent.name} ${goal.name} ${goal.quantity}`)
+                    await new Promise((resolve) => setTimeout(resolve, 3000));
+                } 
+                if (!itemSatisfied(this.agent.bot, goal.name, goal.quantity)) {
+                    let res = await this.item_goal.executeNext(goal.name, goal.quantity);
+                    if (!res) {
+                        this.agent.bot.chat(`I can't build ${this.goals[-1].name}, as stuck when get ${goal.name} x ${goal.quantity}.`);
+                        this.stop();
+                    }
+                } 
+                if (itemSatisfied(this.agent.bot, goal.name, goal.quantity) && this.goals.length > 0) {
+                    this.goals.shift();
+                }
+            } else {
+                console.log(`Build goal: ${goal.name} x ${goal.quantity}.`);
+                let res = await this.build_goal.executeNext(this.blueprint, this.built)
+                for (let block_name in res.missing) {
+                    this.goals.unshift({
+                        name: block_name,
+                        quantity: res.missing[block_name]
+                    })
+                }
+
+                if (res.failed) {
+                    this.agent.bot.chat(res.error);
+                    this.stop();
+                } else {
+                    this.built.position = res.position;
+                }
+
+                if (res.finished && this.goals.length > 0) {
+                    this.goals.shift();
+                } 
+            }
+        } catch (e) {
+            console.log("Error in executing building goal: ", e);
+            this.agent.bot.chat(`I can't build ${goal.name} right now.`);
+            this.stop();
+        }
+
         if (this.goals.length > 0) {
             this.agent.bot.emit("idle");
         } else {
@@ -330,7 +244,6 @@ export class PluginInstance {
             this.stop();
         }
     }
-
     async buildWithIdea(name, idea) {
         if (this.blueprints[name] === undefined) {
             console.log(`Can't find reference blueprint: ${name}.`);
@@ -338,9 +251,9 @@ export class PluginInstance {
         }
         console.log("Building with idea: ", name, idea)
         let blueprint = await this.promptBuilding(name, idea);
-        if (blueprint.blocks !== undefined && blueprint.blocks.length > 0) {
+        if (blueprint && blueprint.blocks && blueprint.blocks.length > 0) {
             console.log(`Generated blueprint to build with:\n${JSON.stringify(blueprint)}`);
-            this.setGoal(name, 1, blueprint);
+            this.setGoal(name, 1, idea, blueprint);
         } else {
             this.agent.bot.chat(`I got an invalid blueprint for ${name}: ${blueprint}`);
             console.log('Error in generating blueprint for building.');
@@ -348,6 +261,7 @@ export class PluginInstance {
     }
 
     async promptBuilding(name, idea) {
+        await this.agent.prompter.checkCooldown();
         let blueprint = this.blueprints[name];
         let items = this.getItemsForBuilding(blueprint);
         let gen_blueprint = null;
@@ -421,7 +335,7 @@ export class PluginInstance {
         return blocks 
     }
 
-    getItemsForBuilding(blueprint) {
+    getItemsForBuilding(blueprint = null) {
         const buildingBlocks = [
             "stone", "cobblestone", "stone_bricks", "oak_planks", "spruce_planks",
             "birch_planks", "dark_oak_planks", "sandstone",

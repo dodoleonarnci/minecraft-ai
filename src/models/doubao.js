@@ -47,4 +47,24 @@ export class Doubao {
         }
         return res;
     }
+    
+    async sendVisionRequest(messages, systemMessage, imageBuffer) {
+        if (!this.model_name.includes("vision"))
+            return null; 
+        const imageMessages = [...messages];
+        imageMessages.push({
+            role: "user",
+            content: [
+                { type: "text", text: systemMessage },
+                {
+                    type: "image_url",
+                    image_url: {
+                        url: `data:image/jpeg;base64,${imageBuffer.toString('base64')}`
+                    }
+                }
+            ]
+        });
+        
+        return this.sendRequest(imageMessages, systemMessage);
+    }
 }

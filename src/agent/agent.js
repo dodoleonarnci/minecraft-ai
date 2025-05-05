@@ -1,24 +1,21 @@
 import { History } from './history.js';
 import { Coder } from './coder.js';
-import { VisionInterpreter } from './vision/vision_interpreter.js';
+import { addBrowserViewer } from './browser_viewer.js';
 import { Prompter } from '../models/prompter.js';
 import { initModes } from './modes.js';
 import { initBot } from '../utils/mcdata.js';
 import { containsCommand, commandExists, executeCommand, truncCommandMessage, isAction, blacklistCommands } from './commands/index.js';
 import { ActionManager } from './action_manager.js';
-import { NPCContoller } from './npc/controller.js';
 import { PluginManager } from './plugin.js';
 import { SelfDrivenThinking } from './thinking.js';
 import { MemoryBank } from './memory_bank.js';
 import { SelfPrompter } from './self_prompter.js';
 import convoManager from './conversation.js';
 import { handleTranslation, handleEnglishTranslation } from '../utils/translator.js';
-import { addBrowserViewer } from './vision/browser_viewer.js';
 import settings from '../../settings.js';
 import { serverProxy } from './agent_proxy.js';
 import { Task } from './tasks.js';
 import { say } from './speak.js';
-import { choose } from '../utils/generation.js';
 
 export class Agent {
     async start(profile_fp, load_mem=false, init_message=null, count_id=0, task_path=null, task_id=null) {
@@ -40,8 +37,6 @@ export class Agent {
         this.history = new History(this);
         console.log('Initializing coder...');
         this.coder = new Coder(this);
-        console.log('Initializing npc controller...');
-        this.npc = new NPCContoller(this);
         console.log('Initializing plugin manager...');
         this.plugin = new PluginManager(this);
         console.log('Initializing self-driven thinking...');
@@ -112,9 +107,6 @@ export class Agent {
                     this.task.initBotTask();
                 }
 
-                console.log('Initializing vision intepreter...');
-                this.vision_interpreter = new VisionInterpreter(this, settings.allow_vision);
-
             } catch (error) {
                 console.error('Error in spawn event:', error);
                 process.exit(0);
@@ -133,7 +125,7 @@ export class Agent {
         ];
         
         const respondAtFunc = async (username, message) => {
-            if (settings.profiles.length === 1 || Object.keys(this.bot.players).length === 2 || message.startsWith("@all") || message.startsWith(`@${this.name}`)) {
+            if (Object.keys(this.bot.players).length === 2 || message.startsWith("@all") || message.startsWith(`@${this.name}`)) {
                 this.respondFunc(username, message)
             }
         }
@@ -455,8 +447,6 @@ export class Agent {
             this.actions.resumeAction();
         });
 
-        // Init NPC controller
-        this.npc.init();
         // Init self-driven thinking 
         this.thinking.init();
         // Init plugin manager

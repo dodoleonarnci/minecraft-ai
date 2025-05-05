@@ -1,8 +1,7 @@
-import * as skills from '../library/skills.js';
-import * as world from '../library/world.js';
+import * as skills from '../../agent/library/skills.js';
+import * as world from '../../agent/library/world.js';
 import * as mc from '../../utils/mcdata.js';
-import { itemSatisfied } from './utils.js';
-
+import { itemSatisfied } from '../../utils/build.js';
 
 const blacklist = [
     'coal_block',
@@ -173,7 +172,6 @@ class ItemNode {
         }
     }
 }
-
 
 class ItemWrapper {
     constructor(manager, parent, name) {
