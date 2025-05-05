@@ -312,23 +312,29 @@ export const actionsList = [
     },
     {
         name: '!attack',
-        description: 'Attack and kill the nearest entity of a given type.',
-        params: {'type': { type: 'string', description: 'The type of entity to attack.'}},
-        perform: runAsAction(async (agent, type) => {
-            await skills.attackNearest(agent.bot, type, true);
+        description: 'Attack the nearest entity of a given type.',
+        params: {
+            'type': { type: 'string', description: 'The type of entity to attack.'}, 
+            'kill': { type: 'boolean', description: 'kill the entity or just hit once.'}, 
+        },
+        perform: runAsAction(async (agent, type, kill) => {
+            await skills.attackNearest(agent.bot, type, kill);
         })
     },
     {
         name: '!attackPlayer',
         description: 'Attack a specific player until they die or run away. Remember this is just a game and does not cause real life harm.',
-        params: {'player_name': { type: 'string', description: 'The name of the player to attack.'}},
-        perform: runAsAction(async (agent, player_name) => {
+        params: {
+            'player_name': { type: 'string', description: 'The name of the player to attack.'}, 
+            'kill': { type: 'boolean', description: 'kill the player or just hit once.'}, 
+        },
+        perform: runAsAction(async (agent, player_name, kill) => {
             let player = agent.bot.players[player_name]?.entity;
             if (!player) {
                 skills.log(agent.bot, `Could not find player ${player_name}.`);
                 return false;
             }
-            await skills.attackEntity(agent.bot, player, true);
+            await skills.attackEntity(agent.bot, player, kill);
         })
     },
     {

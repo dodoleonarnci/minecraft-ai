@@ -320,6 +320,7 @@ export async function attackNearest(bot, mobType, kill=true) {
         return await attackEntity(bot, mob, kill);
     }
     log(bot, 'Could not find any '+mobType+' to attack.');
+    
     return false;
 }
 
