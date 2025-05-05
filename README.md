@@ -14,6 +14,7 @@ Minecraft AI explores how AI Characters (AICs) can become creative, expressive, 
 
 <table>
 <tr>
+<td><a href="https://www.youtube.com/watch?v=LauwH7enj5A" target="_blank"><img src="https://s2.loli.net/2025/05/05/tK8rigzhcU4d6jA.png" alt="How AI Characters Build Better in Minecraft" width="250" height="150"></a></td>
 <td><a href="https://www.youtube.com/watch?v=lI5VubK_eHs" target="_blank"><img src="https://s2.loli.net/2025/05/01/KcO4AXGhmwH7Z2v.png" alt="Minecraft Meets AI Dance Party" width="250" height="150"></a></td>
 <td><a href="https://www.youtube.com/watch?v=xGs_TPBtwKw" target="_blank"><img src="https://s2.loli.net/2025/05/01/kLC1UuOHpgtTjs7.png" alt="Emergent Behavior of Minecraft AIC" width="250" height="150"></a></td>
 </tr>
@@ -42,7 +43,7 @@ Since some models are supported by multiple API providers, the API inference fun
 
 ```json
 {
-    "name": "Dusty", 
+    "name": "Max", 
     "model": {
         "api": "openrouter", 
         "model": "openrouter/deepseek/deepseek-chat-v3-0324:free"
@@ -68,7 +69,7 @@ You only need to specify the API as "pollinations" and select a model from the [
 
 ```json
 {
-    "name": "Oppen", 
+    "name": "Max", 
     "model": {
         "api": "pollinations", 
         "model": "openai-large"
@@ -90,7 +91,7 @@ Then, you must specify the API as "doubao" and select a model for which you have
 
 ```json
 {
-    "name": "Dobson", 
+    "name": "Max", 
     "model": {
         "api": "doubao", 
         "model": "doubao-1-5-pro-32k-250115"
@@ -118,7 +119,7 @@ We have expanded the skin feature of Mindcraft to enable bots to set their skins
 
 ```json
 {
-    "name": "Dobson", 
+    "name": "Max", 
     "skin": {
         "model": "classic",
         "file": "[path to the local stored minecraft skin file]"
@@ -169,7 +170,7 @@ To use the TTS via API function, you need to set "speak" to `true` in the `setti
 
 ```json
 {
-    "name": "Dobson", 
+    "name": "Max", 
     "model": {
         "api": "doubao", 
         "model": "doubao-1-5-pro-32k-250115"
@@ -204,7 +205,7 @@ You can customize the agent’s personality and intrinsic goals by configuring t
 
 ```
 {
-    "name": "Dobson",
+    "name": "Max",
     "model" : {
         "api" : "doubao",
         "model": "doubao-1-5-pro-32k-250115"
@@ -232,7 +233,9 @@ You can refer to src/plugins/Dance for an example implementation.
 
 #### Enabling Plugins
 
-Plugins are only loaded if their names are explicitly listed in the settings.plugins array. If the plugin name is not included, it will be ignored.
+Plugins are only loaded if their names are explicitly listed in the `settings.plugins` array. If the plugin name is not included, it will be ignored.
+
+*Notice:* The `VisionInterpreter` and `NPC` modules of MINDcraft have been converted into plugins in Minecraft AI, which means you should put their names in `plugins` section of `settings.json` to enable them.
 
 <img src="https://s2.loli.net/2025/05/01/BNLAIKhpsiC5naU.gif" alt="AIC dance with the example Dance plugin." width="800" height="450">
 
