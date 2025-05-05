@@ -245,6 +245,10 @@ The memory module has been modularized (in `src/agent/memory.js`)and refactored 
 
 This new structure enables the agent to handle the stuff about memory management without touching other parts of the framework, and provides a solid foundation for experimenting with more advanced, "consciousness-like" memory models.
 
+## Tutorials 
+
+Want to see how it all works? Check out the [Tutorials](https://github.com/aeromechanic000/minecraft-ai/tree/main/tutorials) for usage guides and examples.
+
 ## Documentation
 
 More detailed information of Minecraft AI can be found in the [Documentation](https://github.com/aeromechanic000/minecraft-ai/tree/main/doc).

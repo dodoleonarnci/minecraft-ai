@@ -18,7 +18,7 @@ export class PluginInstance {
                 name: '!dancePoping',
                 description: 'Dance poping.',
                 params: {
-                    'duration': {type: 'int', description: 'The time duration (in millions seconds, i.e. 1000 for 1 second) of dancing.'},
+                    'duration': {type: 'int', description: 'Duration in milliseconds (e.g., 1000 for 1 second).'},
                 },
                 perform : async function(agent, duration) {
                     let result = "";
