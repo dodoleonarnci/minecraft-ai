@@ -320,7 +320,7 @@ export async function attackNearest(bot, mobType, kill=true) {
         return await attackEntity(bot, mob, kill);
     }
     log(bot, 'Could not find any '+mobType+' to attack.');
-    
+
     return false;
 }
 
@@ -333,17 +333,19 @@ export async function attackEntity(bot, entity, kill=true) {
      * @example
      * await skills.attackEntity(bot, entity);
      **/
-    await bot.deactivateItem();
-    await new Promise(resolve => setTimeout(resolve, 200));
+    if (bot.usingHeldItem) {
+        await bot.deactivateItem();
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
 
-    if (heldFightWeapon(bot)) {
+    if (heldBow(bot)) {
         console.log("fight with weapon")
         if (!kill) {
             console.log("hit with weapon")
             fightEntity(bot, entity);
         } else {
             console.log("kill with weapon")
-            while (world.getNearbyEntities(bot, 32).includes(entity) && heldFightWeapon(bot)) {
+            while (world.getNearbyEntities(bot, 32).includes(entity) && heldBow(bot)) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 await fightEntity(bot, entity);
             }
@@ -374,24 +376,25 @@ export async function attackEntity(bot, entity, kill=true) {
     }
 }
 
-function heldFightWeapon(bot) {
+function heldBow(bot) {
     let item = bot.heldItem;
-    return item && item.name.includes("bow");
+    let arrow = bot.inventory.items().find(item => item.name.includes("arrow"));
+    return item && item.name.includes("bow") && arrow;
 } 
 
 async function fightEntity(bot, entity) {
     let item = bot.heldItem;
     if (item && !item.name.includes("crossbow")) {
         let pos = entity.position;
-        if (bot.entity.position.distanceTo(pos) > 8) {
+        if (bot.entity.position.distanceTo(pos) > 12) {
             console.log('moving to mob...')
-            await goToPosition(bot, pos.x, pos.y + 1, pos.z, 6);
+            await goToPosition(bot, pos.x, pos.y + 1, pos.z, 10);
         }
         // fire bow
         await bot.activateItem();
         await new Promise(resolve => setTimeout(resolve, 800));
         await bot.lookAt(entity.position);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
         await bot.deactivateItem();
     } else {
         let pos = entity.position;
@@ -452,8 +455,6 @@ export async function defendSelf(bot, range=9) {
         log(bot, `No enemies nearby to defend self from.`);
     return attacked;
 }
-
-
 
 export async function collectBlock(bot, blockType, num=1, exclude=null) {
     /**
