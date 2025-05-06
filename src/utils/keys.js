@@ -10,13 +10,13 @@ try {
 
 export function getKey(name) {
     let key = keys[name];
-    if (key === undefined) {
+    if (key === undefined || key.trim().length < 1) {
         if (process.env[name]) key = process.env[name];
     }
     if (key === undefined) {
         throw new Error(`API key "${name}" not found in keys.json or environment variables!`);
     }
-    return keys[name];
+    return key;
 }
 
 export function hasKey(name) {

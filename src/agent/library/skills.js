@@ -743,7 +743,7 @@ export async function placeBlock(bot, blockType, x, y, z, placeOn='bottom', dont
     dirs.push(...Object.values(dir_map).filter(d => !dirs.includes(d)));
 
     const cant_place_blocks = ['door', 'bed', 'chest', 'crafting_table', 'furnace', 'dispenser', 'dropper', 'brewing_stand', 'enchanting_table', 'anvil', 'beacon'];
-    const cant_place_names = ['door', 'bed', 'chest'];
+    const cant_place_names = ['door', 'bed', 'chest', 'table', 'furnace'];
 
     for (let d of dirs) {
         const block = bot.blockAt(target_dest.plus(d));
