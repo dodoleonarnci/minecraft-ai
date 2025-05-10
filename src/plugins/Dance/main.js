@@ -21,15 +21,10 @@ export class PluginInstance {
                     'duration': {type: 'int', description: 'Duration in milliseconds (e.g., 1000 for 1 second).'},
                 },
                 perform : async function(agent, duration) {
-                    let result = "";
-                    const actionFn = async (agent, duration) => {
-                        agent.bot.chat("I am dancing~");
-                        agent.bot.setControlState("jump", true);
-                        await new Promise((resolve) => setTimeout(resolve, duration));
-                        agent.bot.setControlState("jump", false);
-                    }
-                    await agent.actions.runAction('action:dance', actionFn);
-                    return result;
+                    agent.bot.chat("I am dancing~");
+                    agent.bot.setControlState("jump", true);
+                    await new Promise((resolve) => setTimeout(resolve, duration));
+                    agent.bot.setControlState("jump", false);
                 }
             },
         ]

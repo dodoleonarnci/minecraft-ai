@@ -4,7 +4,7 @@ import * as world from '../../agent/library/world.js';
 import * as mc from '../../utils/mcdata.js';
 import { blockSatisfied, getTypeOfGeneric} from '../../utils/build.js';
 
-class BuildGoal {
+export class BuildGoal {
     constructor(agent) {
         this.agent = agent;
     }
