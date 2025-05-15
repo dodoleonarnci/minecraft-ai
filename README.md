@@ -6,6 +6,8 @@ Minecraft AI explores how AI Characters (AICs) can become creative, expressive, 
 
 **Minecraft AI** is a project derived from [Mindcraft](https://github.com/kolbytn/mindcraft), building upon the foundational ideas of [Generative Agents](https://github.com/joonspk-research/generative_agents)—including autonomous planning, self-reflection, self-motivated behavior, and long-term goal pursuit—within an interactive Minecraft environment. Instead of creating a new memory system from scratch, the project refactors and extends Mindcraft’s original memory infrastructure, introducing dynamic agent profiles, daily self-generated task lists, and reflective behavior cycles. These enhancements allow agents to interact, plan, and adapt over time based on their experiences and identity, resulting in a lightweight yet compelling simulation of human-like cognition and social dynamics.
 
+👉 For those who are interested in building Minecraft AICs with Python, check out [Minecraft AI-Python](https://github.com/aeromechanic000/minecraft-ai-python).
+
 🦾 This project is currently in development. We are continuously adding and optimizing more functions. If you have any questions, you're welcome to join our Discord server for further discussions!
 
 <a href="https://discord.gg/RKjspnTBmb" target="_blank"><img src="https://s2.loli.net/2025/04/18/CEjdFuZYA4pKsQD.png" alt="Official Discord Server" width="180" height="36"></a>
