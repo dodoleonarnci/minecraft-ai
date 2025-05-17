@@ -12,8 +12,8 @@ const settings = {
     // the base profile is shared by all bots for default prompts/examples/modes
     "base_profile": "./profiles/defaults/creative.json", // also see creative.json, god_mode.json
     "profiles": [
+        "./lucy.json",
         // "./max.json",
-        // "./lucy.json",
         // "./profiles/gpt.json",
         // "./profiles/claude.json",
         // "./profiles/gemini.json",
@@ -43,7 +43,7 @@ const settings = {
     "verbose_commands": true, // show full command syntax
     "narrate_behavior": true, // chat simple automatic actions ('Picking up item!')
     "chat_bot_messages": true, // publicly chat messages to other bots
-    "plugins" : ["Dance", "BuildWithBlueprint"], // plugin will be loaded if and only if it's name appears here
+    "plugins" : [], // plugin will be loaded if and only if it's name appears here
 }
 
 // these environment variables override certain settings

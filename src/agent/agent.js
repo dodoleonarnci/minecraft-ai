@@ -16,6 +16,8 @@ import settings from '../../settings.js';
 import { serverProxy } from './agent_proxy.js';
 import { Task } from './tasks.js';
 import { say } from './speak.js';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
 export class Agent {
     async start(profile_fp, load_mem=false, init_message=null, count_id=0, task_path=null, task_id=null) {
@@ -74,10 +76,14 @@ export class Agent {
             
             // Set skin for profile, requires Fabric Tailor. (https://modrinth.com/mod/fabrictailor)
             if (this.prompter.profile.skin) {
-                if (this.prompter.profile.skin.path) 
+                if (this.prompter.profile.skin.path) {
                     this.bot.chat(`/skin set URL ${this.prompter.profile.skin.model} ${this.prompter.profile.skin.path}`);
-                if (this.prompter.profile.skin.file) 
-                    this.bot.chat(`/skin set upload ${this.prompter.profile.skin.model} ${this.prompter.profile.skin.file}`);
+                }
+                if (this.prompter.profile.skin.file) {
+                    const skin_file = this.prompter.profile.skin.file;
+                    const abs_skin_file = new URL(skin_file, import.meta.url).pathname;
+                    this.bot.chat(`/skin set upload ${this.prompter.profile.skin.model} ${abs_skin_file}`);
+                } 
             } else {
                 this.bot.chat(`/skin clear`);
             }
