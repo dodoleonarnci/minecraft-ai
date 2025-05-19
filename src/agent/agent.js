@@ -17,6 +17,7 @@ import { serverProxy } from './agent_proxy.js';
 import { Task } from './tasks.js';
 import { say } from './speak.js';
 import { fileURLToPath } from 'url';
+import { homedir } from 'os';
 import { dirname, resolve } from 'path';
 
 export class Agent {
@@ -80,9 +81,11 @@ export class Agent {
                     this.bot.chat(`/skin set URL ${this.prompter.profile.skin.model} ${this.prompter.profile.skin.path}`);
                 }
                 if (this.prompter.profile.skin.file) {
-                    const skin_file = this.prompter.profile.skin.file;
-                    const abs_skin_file = new URL(skin_file, import.meta.url).pathname;
-                    this.bot.chat(`/skin set upload ${this.prompter.profile.skin.model} ${abs_skin_file}`);
+                    let skin_path = this.prompter.profile.skin.file 
+                    if (skin_path.startsWith("~")) {
+                        skin_path = homedir() + skin_path.slice(1)
+                    }
+                    this.bot.chat(`/skin set upload ${this.prompter.profile.skin.model} ${skin_path}`);
                 } 
             } else {
                 this.bot.chat(`/skin clear`);
