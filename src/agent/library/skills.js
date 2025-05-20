@@ -3,7 +3,6 @@ import * as world from "./world.js";
 import pf from 'mineflayer-pathfinder';
 import Vec3 from 'vec3';
 
-
 export function log(bot, message) {
     bot.output += message + '\n';
 }
@@ -338,6 +337,7 @@ export async function attackEntity(bot, entity, kill=true) {
         await new Promise(resolve => setTimeout(resolve, 300));
     }
 
+    console.log("***", heldBow(bot))
     if (heldBow(bot)) {
         console.log("fight with weapon")
         if (!kill) {
@@ -378,7 +378,10 @@ export async function attackEntity(bot, entity, kill=true) {
 
 function heldBow(bot) {
     let item = bot.heldItem;
-    let arrow = bot.inventory.items().find(item => item.name.includes("arrow"));
+    let arrow = true; 
+    if (bot.game.gameMode !== 'creative') {
+        arrow = bot.inventory.items().find(item => item.name.includes("arrow"));
+    }
     return item && item.name.includes("bow") && arrow;
 } 
 
@@ -388,24 +391,26 @@ async function fightEntity(bot, entity) {
         let pos = entity.position;
         if (bot.entity.position.distanceTo(pos) > 12) {
             console.log('moving to mob...')
-            await goToPosition(bot, pos.x, pos.y + 1, pos.z, 10);
+            await goToPosition(bot, pos.x, pos.y, pos.z, 10);
         }
         // fire bow
         await bot.activateItem();
         await new Promise(resolve => setTimeout(resolve, 800));
-        await bot.lookAt(entity.position);
+        const offset = 1 + Math.floor(bot.entity.position.distanceTo(entity.position) / 10)
+        await bot.lookAt(entity.position.offset(0, offset, 0));
         await new Promise(resolve => setTimeout(resolve, 200));
         await bot.deactivateItem();
     } else {
         let pos = entity.position;
         if (bot.entity.position.distanceTo(pos) > 12) {
             console.log('moving to mob...')
-            await goToPosition(bot, pos.x, pos.y, pos.z + 1, 10);
+            await goToPosition(bot, pos.x, pos.y, pos.z, 10);
         }
         // fire crossbow
         await bot.activateItem();
         await new Promise(resolve => setTimeout(resolve, 1000));
-        await bot.lookAt(entity.position);
+        const offset = 1 + Math.floor(bot.entity.position.distanceTo(entity.position) / 10)
+        await bot.lookAt(entity.position.offset(0, offset, 0));
         await new Promise(resolve => setTimeout(resolve, 2000));
         await bot.deactivateItem();
     }
