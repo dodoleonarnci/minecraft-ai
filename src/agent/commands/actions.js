@@ -160,29 +160,7 @@ export const actionsList = [
             await skills.moveAway(agent.bot, distance);
         })
     },
-    {
-        name: '!rememberHere',
-        description: 'Save the current location with a given name.',
-        params: {'name': { type: 'string', description: 'The name to remember the location as.' }},
-        perform: async function (agent, name) {
-            const pos = agent.bot.entity.position;
-            agent.memory_bank.rememberPlace(name, pos.x, pos.y, pos.z);
-            return `Location saved as "${name}".`;
-        }
-    },
-    {
-        name: '!goToRememberedPlace',
-        description: 'Go to a saved location.',
-        params: {'name': { type: 'string', description: 'The name of the location to go to.' }},
-        perform: runAsAction(async (agent, name) => {
-            const pos = agent.memory_bank.recallPlace(name);
-            if (!pos) {
-            skills.log(agent.bot, `No location named "${name}" saved.`);
-            return;
-            }
-            await skills.goToPosition(agent.bot, pos[0], pos[1], pos[2], 1);
-        })
-    },
+    
     {
         name: '!givePlayer',
         description: 'Give the specified item to the given player.',

@@ -1,5 +1,11 @@
+
+import * as skills from '../../agent/library/skills.js';
+import * as world from '../../agent/library/world.js';
+import * as mc from '../../utils/mcdata.js';
+
 import { exec } from 'child_process';
-import { textToSpeech } from './tts.js';
+import { textToSpeech } from '../../utils/tts.js';
+import settings from '../../../settings.js';
 
 let speakingQueue = [];
 let isSpeaking = false;
@@ -61,5 +67,29 @@ async function callSpeakAPI(text, voiceType) {
         } catch (error) {
             console.error('TTS Failed:', error.message, error.response.data);
         }
+    }
+}
+
+export class PluginInstance {
+    constructor(agent) {
+        this.agent = agent;
+    }
+
+    init() {
+        this.agent.bot.on("chat", async (username, message) => {
+            if (username === this.agent.bot.username) {
+                if (settings.profiles.length === 1 || this.agent.prompter.profile.speak) {
+                    let [to_translate, remaining] = this.agent.toTranslate(message);
+                    if (to_translate.trim().length > 0) {
+                        say(to_translate, this.agent.prompter.profile.tts_voice_type);
+                    }
+                }
+            } 
+        });
+    }
+
+    getPluginActions() {
+        return [
+        ]
     }
 }

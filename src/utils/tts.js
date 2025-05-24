@@ -3,7 +3,7 @@ import fs from 'fs';
 import { exec } from 'child_process';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-import { getKey } from '../utils/keys.js';
+import { getKey } from './keys.js';
 
 /**
  * tts and play using HTTP one-time synthesis

@@ -28,10 +28,7 @@ const settings = {
     "load_memory": false, // load memory from previous session
     "init_message": "Respond with hello world and your name", // sends to all on spawn
     "only_chat_with": [], // users that the bots listen to and send general messages to. if empty it will chat publicly
-    "speak": false, // allows all bots to speak through system text-to-speech. works on windows, mac, on linux you need to `apt install espeak`
-    "speak_agents" : ["Dusty"],
     "language": "en", // translate to/from this language. Supports these language names: https://cloud.google.com/translate/docs/languages
-    "show_bot_views": false, // show bot's view in browser at localhost:3000, 3001...
     "allow_insecure_coding": true, // allows newAction command and model can write/run code on your computer. enable at own risk
     "blocked_actions" : [], // commands to disable and remove from docs. Ex: ["!setMode"]
     // "blocked_actions" : ["!build", "!endBuild"],
@@ -43,7 +40,7 @@ const settings = {
     "verbose_commands": true, // show full command syntax
     "narrate_behavior": true, // chat simple automatic actions ('Picking up item!')
     "chat_bot_messages": true, // publicly chat messages to other bots
-    "plugins" : [], // plugin will be loaded if and only if it's name appears here
+    "plugins" : ["Speak"], // plugin will be loaded if and only if it's name appears here
 }
 
 // these environment variables override certain settings

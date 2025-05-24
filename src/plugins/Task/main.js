@@ -1,8 +1,10 @@
-import { readFileSync } from 'fs';
-import { executeCommand } from './commands/index.js';
-import { getPosition } from './library/world.js'
-import settings from '../../settings.js';
 
+import { readdirSync, readFileSync } from 'fs';
+import * as skills from '../../agent/library/skills.js';
+import * as world from '../../agent/library/world.js';
+import * as mc from '../../utils/mcdata.js';
+import { executeCommand } from '../../agent/commands/index.js';
+import settings from '../../../settings.js';
 
 export class TaskValidator {
     constructor(data, agent) {
@@ -195,4 +197,22 @@ export class Task {
             await executeCommand(this.agent, `!startConversation("${other_name}", "${this.data.conversation}")`);
         }
     }    
+}
+
+export class PluginInstance {
+    constructor(agent) {
+        this.agent = agent;
+        this.task = null;
+    }
+
+    init() {
+        const task_path = null;
+        const task_id = null;
+        this.task = new Task(this, task_path, task_id);
+        this.task.initBotTask();
+    }
+
+    getPluginActions() {
+        return []
+    }
 }

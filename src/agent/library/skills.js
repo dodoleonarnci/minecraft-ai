@@ -332,87 +332,27 @@ export async function attackEntity(bot, entity, kill=true) {
      * @example
      * await skills.attackEntity(bot, entity);
      **/
-    if (bot.usingHeldItem) {
-        await bot.deactivateItem();
-        await new Promise(resolve => setTimeout(resolve, 300));
-    }
-
-    console.log("***", heldBow(bot))
-    if (heldBow(bot)) {
-        console.log("fight with weapon")
-        if (!kill) {
-            console.log("hit with weapon")
-            fightEntity(bot, entity);
-        } else {
-            console.log("kill with weapon")
-            while (world.getNearbyEntities(bot, 32).includes(entity) && heldBow(bot)) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                await fightEntity(bot, entity);
-            }
-        }
-    } else {
-        let pos = entity.position;
-        await equipHighestAttack(bot)
-        if (!kill) {
-            if (bot.entity.position.distanceTo(pos) > 5) {
-                console.log('moving to mob...')
-                await goToPosition(bot, pos.x, pos.y, pos.z);
-            }
-            console.log('attacking mob...')
-            await bot.attack(entity);
-        } else {
-            bot.pvp.attack(entity);
-            while (world.getNearbyEntities(bot, 24).includes(entity)) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                if (bot.interrupt_code) {
-                    bot.pvp.stop();
-                    return false;
-                }
-            }
-            log(bot, `Successfully killed ${entity.name}.`);
-            await pickupNearbyItems(bot);
-            return true;
-        }
-    }
-}
-
-function heldBow(bot) {
-    let item = bot.heldItem;
-    let arrow = true; 
-    if (bot.game.gameMode !== 'creative') {
-        arrow = bot.inventory.items().find(item => item.name.includes("arrow"));
-    }
-    return item && item.name.includes("bow") && arrow;
-} 
-
-async function fightEntity(bot, entity) {
-    let item = bot.heldItem;
-    if (item && !item.name.includes("crossbow")) {
-        let pos = entity.position;
-        if (bot.entity.position.distanceTo(pos) > 12) {
+    let pos = entity.position;
+    await equipHighestAttack(bot)
+    if (!kill) {
+        if (bot.entity.position.distanceTo(pos) > 5) {
             console.log('moving to mob...')
-            await goToPosition(bot, pos.x, pos.y, pos.z, 10);
+            await goToPosition(bot, pos.x, pos.y, pos.z);
         }
-        // fire bow
-        await bot.activateItem();
-        await new Promise(resolve => setTimeout(resolve, 800));
-        const offset = 1 + Math.floor(bot.entity.position.distanceTo(entity.position) / 10)
-        await bot.lookAt(entity.position.offset(0, offset, 0));
-        await new Promise(resolve => setTimeout(resolve, 200));
-        await bot.deactivateItem();
+        console.log('attacking mob...')
+        await bot.attack(entity);
     } else {
-        let pos = entity.position;
-        if (bot.entity.position.distanceTo(pos) > 12) {
-            console.log('moving to mob...')
-            await goToPosition(bot, pos.x, pos.y, pos.z, 10);
+        bot.pvp.attack(entity);
+        while (world.getNearbyEntities(bot, 24).includes(entity)) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (bot.interrupt_code) {
+                bot.pvp.stop();
+                return false;
+            }
         }
-        // fire crossbow
-        await bot.activateItem();
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const offset = 1 + Math.floor(bot.entity.position.distanceTo(entity.position) / 10)
-        await bot.lookAt(entity.position.offset(0, offset, 0));
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        await bot.deactivateItem();
+        log(bot, `Successfully killed ${entity.name}.`);
+        await pickupNearbyItems(bot);
+        return true;
     }
 }
 

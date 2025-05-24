@@ -1,27 +1,22 @@
 import { History } from './history.js';
 import { Coder } from './coder.js';
-import { addBrowserViewer } from './browser_viewer.js';
 import { Prompter } from '../models/prompter.js';
 import { initModes } from './modes.js';
 import { initBot } from '../utils/mcdata.js';
 import { containsCommand, commandExists, executeCommand, truncCommandMessage, isAction, blacklistCommands } from './commands/index.js';
 import { ActionManager } from './action_manager.js';
 import { PluginManager } from './plugin.js';
-import { SelfDrivenThinking } from './thinking.js';
-import { MemoryBank } from './memory_bank.js';
 import { SelfPrompter } from './self_prompter.js';
 import convoManager from './conversation.js';
 import { handleTranslation, handleEnglishTranslation } from '../utils/translator.js';
 import settings from '../../settings.js';
 import { serverProxy } from './agent_proxy.js';
-import { Task } from './tasks.js';
-import { say } from './speak.js';
 import { fileURLToPath } from 'url';
 import { homedir } from 'os';
 import { dirname, resolve } from 'path';
 
 export class Agent {
-    async start(profile_fp, load_mem=false, init_message=null, count_id=0, task_path=null, task_id=null) {
+    async start(profile_fp, load_mem=false, init_message=null, count_id=0) {
         this.last_sender = null;
         this.count_id = count_id;
         if (!profile_fp) {
@@ -42,19 +37,12 @@ export class Agent {
         this.coder = new Coder(this);
         console.log('Initializing plugin manager...');
         this.plugin = new PluginManager(this);
-        console.log('Initializing self-driven thinking...');
-        this.thinking = new SelfDrivenThinking(this);
-        console.log('Initializing memory bank...');
-        this.memory_bank = new MemoryBank();
         console.log('Initializing self prompter...');
         this.self_prompter = new SelfPrompter(this);
         convoManager.initAgent(this);            
         console.log('Initializing examples...');
         await this.prompter.initExamples();
-        console.log('Initializing task...');
-        this.task = new Task(this, task_path, task_id);
-        const blocked_actions = settings.blocked_actions.concat(this.task.blocked_actions || []);
-        blacklistCommands(blocked_actions);
+        blacklistCommands(settings.blocked_actions);
 
         // for Generative Agents 
 
@@ -101,8 +89,6 @@ export class Agent {
         this.bot.once('spawn', async () => {
             try {
                 clearTimeout(spawnTimeout);
-                addBrowserViewer(this.bot, count_id);
-
                 // wait for a bit so stats are not undefined
                 await new Promise((resolve) => setTimeout(resolve, 1000));
                 
@@ -111,10 +97,6 @@ export class Agent {
 
                 this._setupEventHandlers(save_data, init_message);
                 this.startEvents();
-
-                if (!load_mem) {
-                    this.task.initBotTask();
-                }
 
             } catch (error) {
                 console.error('Error in spawn event:', error);
@@ -233,16 +215,11 @@ export class Agent {
             max_responses = Infinity;
         }
 
-        const self_driven_thinking = message.startsWith("[[Self-Driven Thinking]]");
-        if (self_driven_thinking) {
-            message = message.slice("[[Self-Driven Thinking]]".length).trim(); 
-        }
-
-        const self_prompt = source === 'system' || (source === this.name && !self_driven_thinking) ;
+        const self_prompt = source === 'system';
         const from_other_bot = convoManager.isOtherAgent(source);
 
 
-        if (!self_prompt && !self_driven_thinking && !from_other_bot) { // from user, check for forced commands
+        if (!self_prompt && !from_other_bot) { // from user, check for forced commands
             const user_command_name = containsCommand(message);
             if (user_command_name) {
                 if (!commandExists(user_command_name)) {
@@ -262,7 +239,7 @@ export class Agent {
             }
         }
 
-        if (from_other_bot && !self_driven_thinking)
+        if (from_other_bot)
             this.last_sender = source;
 
         // Now translate the message
@@ -285,7 +262,7 @@ export class Agent {
         await this.history.add(source, message);
         this.history.save();
 
-        if (!self_prompt && !self_driven_thinking && this.self_prompter.isActive()) // message is from user during self-prompting
+        if (!self_prompt && this.self_prompter.isActive()) // message is from user during self-prompting
             max_responses = 1; // force only respond to this message, then let self-prompting take over
 
         for (let i=0; i<max_responses; i++) {
@@ -367,7 +344,7 @@ export class Agent {
         }
     }
 
-    async openChat(message) {
+    toTranslate(message) {
         let to_translate = message;
         let remaining = '';
         let command_name = containsCommand(message);
@@ -376,6 +353,11 @@ export class Agent {
             to_translate = to_translate.substring(0, translate_up_to);
             remaining = message.substring(translate_up_to);
         }
+        return [to_translate, remaining];
+    }
+
+    async openChat(message) {
+        let [to_translate, remaining] = this.toTranslate(message);
         let translated_msg = (await handleTranslation(to_translate)).trim();
         message =  translated_msg + " " + remaining;
         // newlines are interpreted as separate chats, which triggers spam filters. replace them with spaces
@@ -387,11 +369,7 @@ export class Agent {
             }
         }
         else {
-            if (settings.speak) {
-                if (!settings.speak_agents || settings.profiles.length === 1 || settings.speak_agents.includes(this.bot.username)) {
-                    say(to_translate, this.prompter.profile.tts_voice_type);
-                }
-            }
+            
             this.bot.chat(message);
         }
     }
@@ -440,7 +418,6 @@ export class Agent {
             if (jsonMsg.translate && jsonMsg.translate.startsWith('death') && message.startsWith(this.name)) {
                 console.log('Agent died: ', message);
                 let death_pos = this.bot.entity.position;
-                this.memory_bank.rememberPlace('last_death_position', death_pos.x, death_pos.y, death_pos.z);
                 let death_pos_text = null;
                 if (death_pos) {
                     death_pos_text = `x: ${death_pos.x.toFixed(2)}, y: ${death_pos.y.toFixed(2)}, z: ${death_pos.x.toFixed(2)}`;
@@ -456,8 +433,6 @@ export class Agent {
             this.actions.resumeAction();
         });
 
-        // Init self-driven thinking 
-        this.thinking.init();
         // Init plugin manager
         this.plugin.init();
 
@@ -482,15 +457,6 @@ export class Agent {
     async update(delta) {
         await this.bot.modes.update();
         this.self_prompter.update(delta);
-        if (this.task.data) {
-            let res = this.task.isDone();
-            if (res) {
-                await this.history.add('system', `${res.message} ended with code : ${res.code}`);
-                await this.history.save();
-                console.log('Task finished:', res.message);
-                this.killAll();
-            }
-        } 
     }
 
     isIdle() {

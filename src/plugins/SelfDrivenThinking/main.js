@@ -1,8 +1,12 @@
 
-import { readFileSync, mkdirSync, writeFileSync, existsSync } from 'fs';
-import { splitContentAndJSON } from '../utils/generation.js';
+import { Vec3 } from 'vec3';
+import { readFileSync, mkdirSync, writeFileSync, existsSync} from 'fs';
+import * as skills from '../../agent/library/skills.js';
+import * as world from '../../agent/library/world.js';
+import * as mc from '../../utils/mcdata.js';
+import { splitContentAndJSON } from '../../utils/generation.js';
 
-export class SelfDrivenThinking {
+export class PluginInstance {
     constructor(agent) {
         this.agent = agent;
         this.todo_list = [];
@@ -14,7 +18,7 @@ export class SelfDrivenThinking {
     }
 
     init() {
-        const thinking_file = `./bots/${this.agent.name}/thinking.json`;
+        const thinking_file = `bots/${this.agent.name}/thinking.json`;
         if (!existsSync(thinking_file)) {
             this.saveThinking();
         } else {
@@ -40,6 +44,10 @@ export class SelfDrivenThinking {
                 }
             }
         });
+    }
+
+    getPluginActions() {
+        return []
     }
 
     async selfDrivenReflection() {

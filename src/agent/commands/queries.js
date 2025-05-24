@@ -174,13 +174,6 @@ export const queryList = [
         }
     },
     {
-        name: '!savedPlaces',
-        description: 'List all saved locations.',
-        perform: async function (agent) {
-            return "Saved place names: " + agent.memory_bank.getKeys();
-        }
-    },
-    {
         name: '!getCraftingPlan',
         description: "Provides a comprehensive crafting plan for a specified item. This includes a breakdown of required ingredients, the exact quantities needed, and an analysis of missing ingredients or extra items needed based on the bot's current inventory.",
         params: {

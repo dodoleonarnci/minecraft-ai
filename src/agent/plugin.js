@@ -17,7 +17,8 @@ export class PluginManager {
                 this.plugins = plugins;
                 for (let plugin in this.plugins) {
                     if (this.plugins[plugin]) {
-                        addPluginActions(plugin, this.plugins[plugin].getPluginActions());
+                        if (typeof this.plugins[plugin].getPluginActions === 'function')
+                            addPluginActions(plugin, this.plugins[plugin].getPluginActions());
                     }
                 }
                 console.log("Loaded plugins:", Object.keys(this.plugins).filter(key => this.plugins[key] !== null));
@@ -34,7 +35,8 @@ export class PluginManager {
             const plugin = await import(pathToFileURL(path).href);
             if (plugin.PluginInstance) {
                 instance = new plugin.PluginInstance(this.agent);
-                instance.init();
+                if (typeof instance.init === 'function')
+                    instance.init();
             } else {
                 console.error(`Can't find PluginInstance in ${path}.`);
             }
