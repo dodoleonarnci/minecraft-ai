@@ -88,14 +88,6 @@ export const actionsList = [
         }
     },
     {
-        name: '!changeSuit',
-        description: 'Randomly change the suit (skin).',
-        perform: async function (agent) {
-            agent.bot.emit("change_suit")
-            return;
-        }
-    },
-    {
         name: '!goToPlayer',
         description: 'Go to the given player.',
         params: {

@@ -256,6 +256,9 @@ Want to see how it all works? Check out the [Tutorials](https://github.com/aerom
 More detailed information of Minecraft AI can be found in the [Documentation](https://github.com/aeromechanic000/minecraft-ai/tree/main/doc).
 
 ## Citation
+[Minecraft AI Whitepapers](https://github.com/aeromechanic000/minecraft-ai-whitepapers) 
+- [Minecraft AI: Toward Embodied Turing Test Through AI Characters](https://github.com/aeromechanic000/minecraft-ai-whitepaper/blob/main/whitepapers/minecraft_ai_whitepaper-toward_embodied_turing_test_through_ai_characters.pdf)
+
 ```
 @misc{minecraft_ai_2025,
     Author = {Minecraft AI},
