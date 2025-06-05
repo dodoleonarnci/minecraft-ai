@@ -51,7 +51,7 @@ Make sure you're in the `minecraft-ai` directory before continuing.
 
 ### 2. Install Prerequisites
 
-#### 2.1 📦 Install Node Modules
+#### 2.1 Install Node Modules
 
 From the root of the `minecraft-ai` directory, install the required Node.js packages:
 
