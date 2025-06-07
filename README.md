@@ -161,7 +161,7 @@ To supply API keys for LLM backends:
 }
 ```
 
-> 🔐 **Best Practice**: Use [environment variables](./tutorials/set_an_api_key_as_an_environment_variable.md) instead of hardcoding keys. If a key in `keys.json` is blank, Minecraft AI will automatically attempt to read it from your environment variables.
+> 🔐 **Best Practice**: Use [environment variables](./tutorials/set_an_api_key_as_an_environment_variable.md) instead of hardcoding keys. If a key in `keys.json` is blank, Minecraft AI will automatically attempt to read it from your environment variables. For example, if you set `OPENAI_API_KEY = [your_openai_api_key]` as an environment variable, then it will be applied when `OPENAI_API_KEY` is not given a valid key in `keys.json`. 
 
 Then configure the desired model in the `model` section of the bot profile:
 
