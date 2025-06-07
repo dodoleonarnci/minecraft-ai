@@ -4,6 +4,8 @@ Minecraft AI characters (AI bots) are defined through **profile files** written 
 
 This guide walks you through how to create a bot profile that matches your intended design.
 
+🔬 *Try the visual toolkit to create bot profiles:* [Original Character for Minecraft AI](https://minecraft-ai-oc-creator.vercel.app/)
+
 ---
 
 ## 1. Create the Profile File
@@ -30,7 +32,7 @@ Each bot needs a unique `name`. You can also optionally specify a Minecraft skin
 
 * `name`: How the bot appears in chat and the game world.
 * `model`: `"classic"` or `"slim"` depending on the skin format.
-* `file`: Path to the `.png` skin image file.
+* `file`: **Absolute path** to the `.png` skin image file.
 
 ---
 

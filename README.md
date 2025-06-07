@@ -32,6 +32,21 @@ More detailed information can be found in [Minecraft AI Whitepapers and Technica
 
 ## How to Contribute  
 
+We wholeheartedly welcome you to contribute to the Minecraft AI project! Your contributions play a crucial role in shaping this project into a robust and versatile platform for the community.
+
+### Submitting Code via Pull Requests (PRs)
+The primary way to contribute code is through Pull Requests. When creating a PR, please adhere to the general best practices for PRs. Keep each PR focused on a specific issue or feature, and limit the scope of changes to a manageable size. This approach facilitates a smoother review process and enables quicker merging of your contributions. It ensures that our reviewers can thoroughly assess the changes without being overwhelmed by excessive code modifications.
+
+### Code Structure and Compatibility Policies
+Our goal is to establish Minecraft AI as a foundational platform in the community, empowering users to build innovative projects and drive the development of intelligent and engaging AI characters within the game. To achieve this, we have specific policies regarding the codebase:
+
+- **Core and Underlying Code:** For the core implementation and underlying code, as well as the environment setup, we aim to maintain simplicity and focus on essential, indispensable features. Only changes that clearly enhance the performance across all scenarios and address bugs or deficiencies in the underlying code will be considered for merge after careful review.
+- **Optional Features as Plugins:** Any features that are not universally applicable to all scenarios, especially those that can be optionally enabled or disabled at runtime, should be implemented as plugins. Before submitting a plugin, please ensure that it has been thoroughly tested to guarantee its proper functionality. Additionally, refrain from modifying any files outside the plugin's scope, including presetting the plugin's default configuration in the settings. Each plugin should include a README file that clearly outlines how to enable the plugin and any additional parameters required in the bot profile or other relevant areas to ensure optimal performance.
+
+## Community Engagement and Alternative Contribution Methods
+We encourage active communication within the community. If you encounter any issues or have ideas for improvements, feel free to discuss them with us first. We also support alternative ways of contributing, such as forking the repository or creating a separate repository for your plugins. Even if you choose not to submit your plugins to our main code repository, we are more than happy to collaborate and help promote third-party plugins through the Minecraft AI community, ensuring that all players can enjoy a richer gaming experience with enhanced features.
+We look forward to your valuable contributions and the exciting possibilities they bring to the Minecraft AI project!
+
 ---
 
 ## Quick Start 
@@ -92,17 +107,15 @@ If individual packages fail to install, you can try:
 2. Minecraft AI supports **Minecraft Java Edition up to version 1.21.1**.
 3. Launch Minecraft, create a world in the supported version, and open it to LAN (e.g., port `55916`).
 
-### 3. Configure `settings.json`
+### 3. Configure `settings.js`
 
 Edit `settings.json` with the correct game connection settings:
 
-```json
-{
-  "minecraft_version": "1.21.1",
-  "host": "127.0.0.1",
-  "port": 55916,
-  "auth": "offline"
-}
+```js
+"minecraft_version": "1.21.1",
+"host": "127.0.0.1",
+"port": 55916,
+"auth": "offline"
 ```
 
 * `minecraft_version`: match your client version
@@ -113,7 +126,7 @@ Edit `settings.json` with the correct game connection settings:
 
 A bot profile defines an AI character's name, personality, and backend model. Set the profiles to activate in `settings.json`:
 
-```json
+```js
 "profiles": ["./max.json"]
 ```
 
@@ -292,7 +305,7 @@ Want to see how it all works? Check out the [Tutorials](https://github.com/aerom
 - [Multimodal Interaction](#multimodal-interaction)
 - [Memory Module](#memory-module)
 
-### Support for Plugins (PR to Mindcraft)
+### Support for Plugins
 
 We added a module, `PluginManager` (`src/agent/plugin.js`), which enables dynamic loading of modular agent plugins. It searches the `src/plugins` directory and loads plugins based on the current configuration. With plugins, we can extend the available actions dynamically, which reduce the pressure for putting long `COMMAND_DOCS` into the always limited LLM context. 
 
