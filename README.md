@@ -12,7 +12,7 @@ More detailed information can be found in [Minecraft AI Whitepapers and Technica
 
 - [Minecraft AI: Toward Embodied Turing Test Through AI Characters](https://github.com/aeromechanic000/minecraft-ai-whitepaper/blob/main/whitepapers/minecraft_ai_whitepaper-toward_embodied_turing_test_through_ai_characters.pdf)
 
-🧜 **Meet Max**, our new AI assistant for the Minecraft AI community! Ask questions, get started with AIC profiles, or explore tutorials — Max is here to help: [https://www.coze.com/s/ZmFp9aCtM/](https://www.coze.com/s/ZmFp9aCtM/)
+🧜 **Meet Max**, our new AI assistant for the Minecraft AI community! Ask questions, get started with AIC profiles, or explore tutorials — Max is here to help: [Max@MinecraftAI](https://www.coze.com/s/ZmFp9aCtM/)
 
 ⚒️ This project is currently in development. We are continuously adding and optimizing more functions. If you have any questions, you're welcome to join our Discord server for further discussions!
 
