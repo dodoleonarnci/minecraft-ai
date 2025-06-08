@@ -1,9 +1,11 @@
 import { Server } from 'socket.io';
 import { getKey, hasKey } from '../utils/keys.js';
+import settings from '../../settings.js';
 import express from 'express';
 import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cors_proxy from 'cors-anywhere';
 
 // Module-level variables
 let io;
@@ -11,6 +13,26 @@ let server;
 const registeredAgents = new Set();
 const inGameAgents = {};
 const agentManagers = {}; // socket for main process that registers/controls agents
+
+export function createProxyServer(port = 8081, options = []) {
+    const defaultOptions = {
+        originWhitelist: [],
+        requireHeader: [],
+        removeHeaders: ['cookie', 'cookie2'],
+        redirectSameOrigin: true,
+        httpProxyOptions: {
+            xfwd: false,
+        }
+    };
+    
+    const server = cors_proxy.createServer({...defaultOptions, ...options});
+    
+    server.listen(port, 'localhost', () => {
+        console.log(`CORS proxy server started on port ${port}`);
+    });
+    
+    return server; 
+}
 
 // Initialize the server
 export function createMindServer(port = 8080) {
@@ -29,6 +51,7 @@ export function createMindServer(port = 8080) {
 
         agentsUpdate(socket);
         keysUpdate(socket);
+        portsUpdate(socket);
 
         socket.on('register-agents', (agentNames) => {
             console.log(`Registering agents: ${agentNames}`);
@@ -160,6 +183,17 @@ function keysUpdate(socket) {
         "OPENAI_API_KEY" : getKey("OPENAI_API_KEY"),
     };
     socket.emit('keys-update', keys);
+}
+
+function portsUpdate(socket) {
+    if (!socket) {
+        socket = io;
+    }
+    let ports = {
+        "proxy" : settings.proxyserver_port,
+        "mind" : settings.mindserver_port,
+    };
+    socket.emit('ports-update', ports);
 }
 
 function stopAllAgents() {
