@@ -27,6 +27,7 @@ const settings = {
         // individual profiles override values from the base profile
     ],
     "load_memory": false, // load memory from previous session
+    "memory_bank_size": 20, // max number of facts to remember in memory bank
     "init_message": "Respond with hello world and your name", // sends to all on spawn
     "only_chat_with": [], // users that the bots listen to and send general messages to. if empty it will chat publicly
     "language": "en", // translate to/from this language. Supports these language names: https://cloud.google.com/translate/docs/languages

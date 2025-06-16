@@ -209,6 +209,7 @@ export class PluginInstance {
                 } 
                 if (itemSatisfied(this.agent.bot, goal.name, goal.quantity) && this.goals.length > 0) {
                     this.goals.shift();
+                    console.log("Left goals (item goal shifted): ", this.goals);
                 }
             } else {
                 console.log(`Build goal: ${goal.name} x ${goal.quantity}.`);
@@ -229,6 +230,7 @@ export class PluginInstance {
 
                 if (res.finished && this.goals.length > 0) {
                     this.goals.shift();
+                    console.log("Left goals (build goal shifted): ", this.goals);
                 } 
             }
         } catch (e) {
@@ -237,6 +239,7 @@ export class PluginInstance {
             this.stop();
         }
 
+        console.log("Left goals: ", this.goals);
         if (this.goals.length > 0) {
             this.agent.bot.emit("idle");
         } else {

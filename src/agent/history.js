@@ -70,7 +70,8 @@ export class History {
     async save() {
         try {
             const data = {
-                memory: this.memory.get(),
+                memory_summary: this.memory.summary,
+                memory_bank: this.memory.bank,
                 turns: this.turns,
                 self_prompting_state: this.agent.self_prompter.state,
                 self_prompt: this.agent.self_prompter.isStopped() ? null : this.agent.self_prompter.prompt,
@@ -91,7 +92,7 @@ export class History {
                 return null;
             }
             const data = JSON.parse(readFileSync(this.memory_fp, 'utf8'));
-            this.memory.set({raw : data.memory || ''});
+            this.memory.set({summary : data.memory_summary || '', bank : data.memory_bank || {}});
             this.turns = data.turns || [];
             console.log('Loaded memory:', this.memory.get());
             return data;

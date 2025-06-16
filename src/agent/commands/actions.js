@@ -315,6 +315,18 @@ export const actionsList = [
         })
     },
     {
+        name: '!remember',
+        description: 'Save facts and information in the "Memory Bank". The agent can remember a limited number of facts, so use this wisely; if there is already a similar "key" in the "Memory Bank", update existing facts instead of creating new ones.',
+        params: {
+            'key': { type: 'string', description: 'A key in string format to describe the topic' }, 
+            'value': { type: 'string', description: 'A value string describe the fact or information to remember'}, 
+        },
+        perform: async function (agent, key, value) {
+            agent.history.memory.remember(key, value);
+            return `Fact remembered as "${key}".`;
+        }
+    },
+    {
         name: '!activate',
         description: 'Activate the nearest object of a given type.',
         params: {'type': { type: 'BlockName', description: 'The type of object to activate.' }},

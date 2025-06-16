@@ -10,7 +10,7 @@
         "api" : "doubao",
         "model": "doubao-1-5-pro-32k-250115"
     },
-    "viewer" : true,
+    "viewer" : false,
     "vision_model" : {
         "api" : "doubao",
         "model": "doubao-1-5-vision-pro-32k-250115"

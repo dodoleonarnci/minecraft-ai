@@ -690,7 +690,8 @@ export async function placeBlock(bot, blockType, x, y, z, placeOn='bottom', dont
     const cant_place_names = ['door', 'bed', 'chest', 'table', 'furnace'];
     for (let d of dirs) {
         const block = bot.blockAt(target_dest.plus(d));
-        if (!empty_blocks.includes(block.name) && !cant_place_names.some(name => block.name.includes(name))) {
+        // if (!empty_blocks.includes(block.name) && !cant_place_names.some(name => block.name.includes(name))) {
+        if (!empty_blocks.includes(block.name)) {
             buildOffBlock = block;
             faceVec = new Vec3(-d.x, -d.y, -d.z); // invert
             break;
@@ -725,9 +726,11 @@ export async function placeBlock(bot, blockType, x, y, z, placeOn='bottom', dont
 
     // will throw error if an entity is in the way, and sometimes even if the block was placed
     try {
+        bot.setControlState("sneak", true);
         await bot.placeBlock(buildOffBlock, faceVec);
         log(bot, `Placed ${blockType} at ${target_dest}.`);
         await new Promise(resolve => setTimeout(resolve, 300));
+        bot.setControlState("sneak", false);
         return true;
     } catch (err) {
         log(bot, `Failed to place ${blockType} at ${target_dest}.`);
