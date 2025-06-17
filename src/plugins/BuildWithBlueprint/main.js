@@ -335,7 +335,7 @@ export class PluginInstance {
         if (data.blocks && Array.isArray(data.blocks)) {
             blocks = data.blocks;
         }
-        return blocks 
+        return blocks
     }
 
     getItemsForBuilding(blueprint = null) {

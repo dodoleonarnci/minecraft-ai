@@ -31,7 +31,7 @@ const settings = {
     "init_message": "Respond with hello world and your name", // sends to all on spawn
     "only_chat_with": [], // users that the bots listen to and send general messages to. if empty it will chat publicly
     "language": "en", // translate to/from this language. Supports these language names: https://cloud.google.com/translate/docs/languages
-    "allow_insecure_coding": true, // allows newAction command and model can write/run code on your computer. enable at own risk
+    "allow_insecure_coding": false, // allows newAction command and model can write/run code on your computer. enable at own risk
     "blocked_actions" : [], // commands to disable and remove from docs. Ex: ["!setMode"]
     // "blocked_actions" : ["!build", "!endBuild"],
     "code_timeout_mins": -1, // minutes code is allowed to run. -1 for no timeout

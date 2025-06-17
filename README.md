@@ -152,7 +152,7 @@ Here’s a minimal example of `max.json`:
 
 To supply API keys for LLM backends:
 
-1. Copy `keys.example.json` to `keys.json`
+1. Make a copy of `keys.example.json`, and rename the copy to `keys.json`
 2. Fill in your API keys for the models you want to use:
 
 ```json
@@ -289,6 +289,15 @@ This usually means your `minecraft_version` setting does not match the running g
 ```json
 "minecraft_version": "1.21.1"
 ```
+
+#### `keys.json` not found 
+
+Even if you’ve provided all required keys via environment variables, the minecraft-ai project still expects a file named keys.json to exist in the root directory.
+
+If the file appears to be present but you're still seeing a "keys.json not found" error, double-check its actual filename.
+In some cases, especially on Windows or macOS, your file may be accidentally saved as keys.json.txt or with another hidden extension. File explorers often hide these by default.
+
+👉 To fix this, make sure the file is named exactly keys.json — no hidden extensions, no extra suffixes.
 
 ---
 

@@ -84,7 +84,6 @@ Access the variable in your application code using your language’s environment
 
 ```js
 const apiKey = process.env.MY_API_KEY;
-console.log("My API Key is:", apiKey);
 ```
 
 ---

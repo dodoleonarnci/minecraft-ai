@@ -1,218 +1,109 @@
 
-import { readdirSync, readFileSync } from 'fs';
+import { readdirSync, readFileSync, existsSync } from 'fs';
 import * as skills from '../../agent/library/skills.js';
 import * as world from '../../agent/library/world.js';
 import * as mc from '../../utils/mcdata.js';
 import { executeCommand } from '../../agent/commands/index.js';
 import settings from '../../../settings.js';
 
-export class TaskValidator {
-    constructor(data, agent) {
-        this.target = data.target;
-        this.number_of_target = data.number_of_target;
-        this.agent = agent;
-    }
-
-    validate() {
-        try{
-            let valid = false;
-            let total_targets = 0;
-            this.agent.bot.inventory.slots.forEach((slot) => {
-                if (slot && slot.name.toLowerCase() === this.target) {
-                    total_targets += slot.count;
-                }
-                if (slot && slot.name.toLowerCase() === this.target && slot.count >= this.number_of_target) {
-                    valid = true;
-                    console.log('Task is complete');
-                }
-            });
-            if (total_targets >= this.number_of_target) {
-                valid = true;
-                console.log('Task is complete');
-            }
-            return valid;
-        } catch (error) {
-            console.error('Error validating task:', error);
-            return false;
-        }
-    }
-}
-
 export class Task {
-    constructor(agent, task_path, task_id) {
+    constructor(agent, configs) {
         this.agent = agent;
-        this.data = null;
-        this.taskTimeout = 300;
-        this.taskStartTime = Date.now();
-        this.validator = null;
-        this.blocked_actions = [];
-        if (task_path && task_id) {
-            this.data = this.loadTask(task_path, task_id);
-            this.taskTimeout = this.data.timeout || 300;
-            this.taskStartTime = Date.now();
-            this.validator = new TaskValidator(this.data, this.agent);
-            if (this.data.blocked_actions) {
-                this.blocked_actions = this.data.blocked_actions[this.agent.count_id.toString()] || [];
-            } else {
-                this.blocked_actions = [];
-            }
-            this.restrict_to_inventory = !!this.data.restrict_to_inventory;
-            if (this.data.goal)
-                this.blocked_actions.push('!endGoal');
-            if (this.data.conversation)
-                this.blocked_actions.push('!endConversation');
-        }
+        this.configs = configs;
+        this.timeout = 300;
+        this.start_time = Date.now();
     }
-
-    loadTask(task_path, task_id) {
-        try {
-            const tasksFile = readFileSync(task_path, 'utf8');
-            const tasks = JSON.parse(tasksFile);
-            const task = tasks[task_id];
-            if (!task) {
-                throw new Error(`Task ${task_id} not found`);
-            }
-            if ((!task.agent_count || task.agent_count <= 1) && this.agent.count_id > 0) {
-                task = null;
-            }
-
-            return task;
-        } catch (error) {
-            console.error('Error loading task:', error);
-            process.exit(1);
-        }
+    
+    async execute() {
     }
-
-    isDone() {
-        if (this.validator && this.validator.validate())
-            return {"message": 'Task successful', "code": 2};
-        if (this.taskTimeout) {
-            const elapsedTime = (Date.now() - this.taskStartTime) / 1000;
-            if (elapsedTime >= this.taskTimeout) {
-                console.log('Task timeout reached. Task unsuccessful.');
-                return {"message": 'Task timeout reached', "code": 4};
-            }
-        }
-        return false;
-    }
-
-    async initBotTask() {
-        if (this.data === null)
-            return;
-        let bot = this.agent.bot;
-        let name = this.agent.name;
-
-        bot.chat(`/clear ${name}`);
-        console.log(`Cleared ${name}'s inventory.`);
-
-        //kill all drops
-        if (this.agent.count_id === 0) {
-            bot.chat(`/kill @e[type=item]`);
-        }
-        //wait for a bit so inventory is cleared
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        let initial_inventory = null;
-        if (this.data.agent_count > 1) {
-            initial_inventory = this.data.initial_inventory[this.agent.count_id.toString()];
-            console.log("Initial inventory:", initial_inventory);
-        } else if (this.data) {
-            console.log("Initial inventory:", this.data.initial_inventory);
-            initial_inventory = this.data.initial_inventory;
-        }
-    
-        if ("initial_inventory" in this.data) {
-            console.log("Setting inventory...");
-            console.log("Inventory to set:", initial_inventory);
-            for (let key of Object.keys(initial_inventory)) {
-                console.log('Giving item:', key);
-                bot.chat(`/give ${name} ${key} ${initial_inventory[key]}`);
-            };
-            //wait for a bit so inventory is set
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            console.log("Done giving inventory items.");
-        }
-        // Function to generate random numbers
-    
-        function getRandomOffset(range) {
-            return Math.floor(Math.random() * (range * 2 + 1)) - range;
-        }
-    
-        let human_player_name = null;
-        let available_agents = settings.profiles.map((p) => JSON.parse(readFileSync(p, 'utf8')).name);  // TODO this does not work with command line args
-    
-        // Finding if there is a human player on the server
-        for (const playerName in bot.players) {
-            const player = bot.players[playerName];
-            if (!available_agents.some((n) => n === playerName)) {
-                console.log('Found human player:', player.username);
-                human_player_name = player.username
-                break;
-            }
-        }
-
-        // If there are multiple human players, teleport to the first one
-    
-        // teleport near a human player if found by default
-    
-        if (human_player_name) {
-            console.log(`Teleporting ${name} to human ${human_player_name}`)
-            bot.chat(`/tp ${name} ${human_player_name}`) // teleport on top of the human player
-    
-        }
-        await new Promise((resolve) => setTimeout(resolve, 200));
-    
-        // now all bots are teleport on top of each other (which kinda looks ugly)
-        // Thus, we need to teleport them to random distances to make it look better
-    
-        /*
-        Note : We don't want randomness for construction task as the reference point matters a lot.
-        Another reason for no randomness for construction task is because, often times the user would fly in the air,
-        then set a random block to dirt and teleport the bot to stand on that block for starting the construction,
-        This was done by MaxRobinson in one of the youtube videos.
-        */
-    
-        if (this.data.type !== 'construction') {
-            const pos = getPosition(bot);
-            const xOffset = getRandomOffset(5);
-            const zOffset = getRandomOffset(5);
-            bot.chat(`/tp ${name} ${Math.floor(pos.x + xOffset)} ${pos.y + 3} ${Math.floor(pos.z + zOffset)}`);
-            await new Promise((resolve) => setTimeout(resolve, 200));
-        }
-
-        if (this.data.agent_count && this.data.agent_count > 1) {
-            // TODO wait for other bots to join
-            await new Promise((resolve) => setTimeout(resolve, 10000));
-            if (available_agents.length < this.data.agent_count) {
-                console.log(`Missing ${this.data.agent_count - available_agents.length} bot(s).`);
-                this.agent.killAll();
-            }
-        }
-
-        if (this.data.goal) {
-            await executeCommand(this.agent, `!goal("${this.data.goal}")`);
-        }
-    
-        if (this.data.conversation && this.agent.count_id === 0) {
-            let other_name = available_agents.filter(n => n !== name)[0];
-            await executeCommand(this.agent, `!startConversation("${other_name}", "${this.data.conversation}")`);
-        }
-    }    
 }
 
 export class PluginInstance {
     constructor(agent) {
         this.agent = agent;
+        this.plans = []
         this.task = null;
     }
 
     init() {
-        const task_path = null;
-        const task_id = null;
-        this.task = new Task(this, task_path, task_id);
-        this.task.initBotTask();
+        try {
+            const dir = 'src/plugins/Task/plans/';
+            for (let file of readdirSync(dir)) {
+                if (file.endsWith('.json') && !file.startsWith('.')) {
+                    this.plans[file.slice(0, -5)] = JSON.parse(readFileSync(join(dir, file), 'utf8'));
+                }
+            }
+        } catch (e) {
+            console.log('Error reading plan files:', e);
+        }
+
+        try {
+            const path = `bots/${this.agent.name}/task.json`;
+            if (existsSync(this.path)) {
+                const taskConfigs = JSON.parse(readFileSync(path, 'utf8'));
+                this.task = Task(this.agent, taskConfigs);
+            }
+        } catch (e) {
+            console.log('Error reading task file:', e);
+        }
+
+        this.agent.bot.on('idle', async () => {
+            if (!this.agent.isIdle() || this.task === null) return;
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+            if (!this.agent.actions.resume_func) {
+                await this.executeTask();
+                this.agent.history.save();
+            }
+        });
+    }
+
+    async executeTask() {
+        if (this.task) {
+            console.log(`Execute task: ${this.task.configs}`);
+            this.task.execute();
+        } else {
+            console.log("Current task is null. Nothing to execute.");
+        }
+    }
+
+    async newTask(task_name, requirement, collaborate = false) {
+        console.log(`Get a new task: task_name = ${task_name}, requirement = ${requirement}, collaborate = ${collaborate}.`);
+    }
+
+    stopTask() {
+        this.task = null;
     }
 
     getPluginActions() {
-        return []
+        return [
+            {
+                name: '!executeTask',
+                description: `Execute the current task, only if its status is 'true', which means the current task is not null. Status of the current task: ${this.task !== null}`,
+                params: {},
+                perform: async function (agent) {
+                    await agent.plugin.plugins["Task"].executeTask();
+                }
+            },
+            {
+                name: '!newTask',
+                description: 'start a new task with the given name and requirements',
+                params: {
+                    'task_name': { type: 'string', description: 'name of the task to perform, which should be one of the options ["cooking", "crafting", "construction"].' },
+                    'requirement': { type: 'string', description: 'a string that describes the requirement of the task in natural language.' },
+                    'collaborate': { type: 'bool', description: 'indicate whether the bot should try to collaborate in executing the task.' },
+                },
+                perform: async function (agent, task_name, requirement, collaborate) {
+                    await agent.plugin.plugins["Task"].newTask(task_name, requirement, collaborate);
+                }
+            },
+            {
+                name: '!stopTask',
+                description: 'stop the execution of current task.',
+                perform: async function (agent) {
+                    agent.plugin.plugins["Task"].stopTask();
+                    return 'Task execution stopped.';
+                }
+            },
+        ]
     }
 }
