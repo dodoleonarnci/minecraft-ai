@@ -13,7 +13,7 @@ const settings = {
     // the base profile is shared by all bots for default prompts/examples/modes
     "base_profile": "./profiles/defaults/creative.json", // also see creative.json, god_mode.json
     "profiles": [
-        // "./lucy.json",
+        "./lucy.json",
         "./max.json",
         // "./profiles/gpt.json",
         // "./profiles/claude.json",
