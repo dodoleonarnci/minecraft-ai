@@ -22,7 +22,7 @@ export class PluginInstance {
     constructor(agent) {
         this.agent = agent;
         this.available_agents = [];
-        this.plans = []
+        this.plans = {}
         this.task = null;
         this.goal = null;
     }
