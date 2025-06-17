@@ -1,6 +1,9 @@
 # Set an API Key as an Environment Variable
 
-Environment variables are a secure and flexible way to store secrets like API keys without hardcoding them into your codebase. This tutorial explains how to set an environment variable for an API key on Windows, macOS, and Linux, and how to make it persistent across sessions.
+Environment variables are a secure and flexible way to manage secrets like API keys without hardcoding them into your codebase.
+This tutorial covers how to set environment variables on Windows, macOS, and Linux, and how to make them persistent across sessions.
+
+In `minecraft-ai` and `minecraft-ai-python`, when a key is not found in the `keys.json` file, the system will automatically check for a corresponding environment variable. If the variable exists, its value will be used in place of the missing key.
 
 ---
 
@@ -76,19 +79,7 @@ export MY_API_KEY="your-actual-api-key-value"
 
 ---
 
-## 4. ✅ Use the Variable in Code
-
-Access the variable in your application code using your language’s environment API.
-
-### Node.js Example
-
-```js
-const apiKey = process.env.MY_API_KEY;
-```
-
----
-
-## 5. 🔒 Security Tips
+## 4. 🔒 Security Tips
 
 * Never commit `.env` files or hardcoded keys into Git.
 * Use `.gitignore` to exclude secrets.
