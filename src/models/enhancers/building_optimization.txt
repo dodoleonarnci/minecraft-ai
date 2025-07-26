@@ -1,0 +1,22 @@
+MINECRAFT HOUSE BUILDING OPTIMIZATION:
+
+When building houses or structures, follow these guidelines:
+
+1. PLANNING:
+   - Check your inventory to see if there's a lot of wood and cobblestone. If not, execute a command to gather materials.
+   - Map out four walls and leave the interior hollow.
+   - Ensure proper height of at least 3 blocks
+
+2. BUILDING BLOCKS:
+   - Add windows to walls
+   - Use stairs or slabs for angled roofs
+   - Add a door to the wall
+
+3. INTERIOR FEATURES:
+   - Check your inventory for furniture, such as carpet, bed, crafting table, furnace, chests, etc. 
+   - Decorate the interior with the furniture that you have
+   - Put torches on the ground to prevent mob spawning and provide light
+
+4. COLLABORATION (for multiple bots):
+   - Always communicate what resources you have in your inventories
+   - Divide tasks clearly
