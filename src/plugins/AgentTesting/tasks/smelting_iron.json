@@ -1,0 +1,34 @@
+{
+  "task_id": "smelting_iron",
+  "description": "Test agent's ability to smelt iron ore into iron ingots",
+  "seed": "55667788",
+  "world_name": "test_world_smelting",
+
+  "goal": "Smelt 5 raw iron into iron ingots using the furnace and coal provided",
+
+  "starting_prompt": "You have a furnace, raw iron, and coal in your inventory. Your task is to place the furnace, use it to smelt all 5 raw iron into iron ingots. Place the furnace on the ground, right-click it to open, put coal as fuel in the bottom slot, and raw iron in the top slot. Wait for the smelting to complete.",
+
+  "starting_inventory": {
+    "furnace": 1,
+    "raw_iron": 5,
+    "coal": 10
+  },
+
+  "teleport_coordinates": {
+    "x": 200,
+    "y": 64,
+    "z": -100,
+    "dimension": "overworld"
+  },
+
+  "test_config": {
+    "timeout_seconds": 300,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "iron_ingot": 5
+      }
+    }
+  }
+}

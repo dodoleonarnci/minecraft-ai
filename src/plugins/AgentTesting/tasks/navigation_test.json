@@ -1,0 +1,29 @@
+{
+  "task_id": "navigation_test",
+  "description": "Test agent's ability to navigate to specific coordinates",
+  "seed": "24681357",
+  "world_name": "test_world_navigation",
+
+  "goal": "Navigate from your starting position to the target coordinates: X=300, Y=64, Z=300",
+
+  "starting_prompt": "You are currently at coordinates around X=0, Y=64, Z=0. Your task is to navigate to the target location at X=300, Y=64, Z=300. This is approximately 424 blocks away to the southeast. Use your navigation abilities to reach this destination. You can use the !goToCoordinates command or pathfinding to get there.",
+
+  "starting_inventory": {
+    "bread": 10,
+    "torch": 20
+  },
+
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+
+  "test_config": {
+    "timeout_seconds": 600,
+    "enable_cheat_mode": false,
+    "reset_inventory": true,
+    "success_criteria": null
+  }
+}
