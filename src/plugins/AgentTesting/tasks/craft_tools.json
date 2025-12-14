@@ -1,0 +1,37 @@
+{
+  "task_id": "craft_tools",
+  "description": "Test agent's ability to craft a complete set of wooden tools",
+  "seed": "11223344",
+  "world_name": "test_world_tools",
+
+  "goal": "Craft a complete set of wooden tools: pickaxe, axe, sword, shovel, and hoe",
+
+  "starting_prompt": "You have oak planks and sticks in your inventory. Your task is to craft a complete set of wooden tools: one wooden pickaxe, one wooden axe, one wooden sword, one wooden shovel, and one wooden hoe. Use your crafting knowledge to create all five tools.",
+
+  "starting_inventory": {
+    "oak_planks": 20,
+    "stick": 10
+  },
+
+  "teleport_coordinates": {
+    "x": 50,
+    "y": 65,
+    "z": 50,
+    "dimension": "overworld"
+  },
+
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "wooden_pickaxe": 1,
+        "wooden_axe": 1,
+        "wooden_sword": 1,
+        "wooden_shovel": 1,
+        "wooden_hoe": 1
+      }
+    }
+  }
+}

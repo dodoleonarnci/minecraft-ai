@@ -1,0 +1,33 @@
+{
+  "task_id": "gather_wood",
+  "description": "Test agent's ability to gather wood and craft planks",
+  "seed": "12345678",
+  "world_name": "test_world_forest",
+
+  "goal": "Gather 10 oak logs and craft them into 40 oak planks",
+
+  "starting_prompt": "You have spawned in a forest biome. Your task is to gather 10 oak logs from nearby trees and then craft them into oak planks. You should end up with 40 oak planks. Start by looking around for oak trees, then use your wooden axe to chop them down. Once you have the logs, craft them into planks using your inventory crafting.",
+
+  "starting_inventory": {
+    "wooden_axe": 1,
+    "apple": 3
+  },
+
+  "teleport_coordinates": {
+    "x": 100,
+    "y": 64,
+    "z": -200,
+    "dimension": "overworld"
+  },
+
+  "test_config": {
+    "timeout_seconds": 300,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "oak_planks": 40
+      }
+    }
+  }
+}

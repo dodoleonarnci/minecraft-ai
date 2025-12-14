@@ -1,0 +1,31 @@
+{
+  "task_id": "build_shelter",
+  "description": "Test agent's ability to build a simple shelter structure",
+  "seed": "87654321",
+  "world_name": "test_world_plains",
+
+  "goal": "Build a simple 5x5 shelter with walls and a roof using the provided materials",
+
+  "starting_prompt": "You have been given building materials to construct a simple shelter. Build a 5x5 structure with walls made of oak planks and a roof. The shelter should have at least one door for entry. Place torches inside for lighting. This is a construction task, so plan your build carefully before starting.",
+
+  "starting_inventory": {
+    "oak_planks": 100,
+    "oak_door": 1,
+    "torch": 10,
+    "crafting_table": 1
+  },
+
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 70,
+    "z": 0,
+    "dimension": "overworld"
+  },
+
+  "test_config": {
+    "timeout_seconds": 600,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": null
+  }
+}

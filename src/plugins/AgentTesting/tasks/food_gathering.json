@@ -1,0 +1,28 @@
+{
+  "task_id": "food_gathering",
+  "description": "Test agent's ability to gather and prepare food",
+  "seed": "13579246",
+  "world_name": "test_world_food",
+
+  "goal": "Kill animals and collect at least 10 pieces of raw meat (any type)",
+
+  "starting_prompt": "You are in an area with various animals. Your task is to hunt animals and collect at least 10 pieces of raw meat. This could be raw beef from cows, raw porkchop from pigs, raw chicken from chickens, or raw mutton from sheep. Use your wooden sword to kill the animals efficiently.",
+
+  "starting_inventory": {
+    "wooden_sword": 1
+  },
+
+  "teleport_coordinates": {
+    "x": -50,
+    "y": 70,
+    "z": -50,
+    "dimension": "overworld"
+  },
+
+  "test_config": {
+    "timeout_seconds": 300,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": null
+  }
+}
