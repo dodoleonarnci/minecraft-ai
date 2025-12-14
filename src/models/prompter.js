@@ -17,17 +17,17 @@ import { HuggingFace } from './huggingface.js';
 import { Qwen } from "./qwen.js";
 import { Doubao } from "./doubao.js";
 import { Pollinations } from "./pollinations.js";
-import { Grok } from "./grok.js";
 import { DeepSeek } from './deepseek.js';
 import { Hyperbolic } from './hyperbolic.js';
 import { GLHF } from './glhf.js';
 import { OpenRouter } from './openrouter.js';
-import { promptEnhancer } from './enhancers/enhancer_generic.js'
+import { generalEnhancer} from './enhancers/enhancer_generic.js'
 
 export class Prompter {
     constructor(agent, fp) {
         this.agent = agent;
         this.profile = JSON.parse(readFileSync(fp, 'utf8'));
+
         let default_profile = JSON.parse(readFileSync('./profiles/defaults/_default.json', 'utf8'));
         let base_fp = settings.base_profile;
         let base_profile = JSON.parse(readFileSync(base_fp, 'utf8'));
@@ -56,6 +56,8 @@ export class Prompter {
         let max_tokens = null;
         if (this.profile.max_tokens)
             max_tokens = this.profile.max_tokens;
+
+        this.enhancer = new generalEnhancer(this.profile);
 
         let chat_model_profile = this._selectAPI(this.profile.model);
         this.chat_model = this._createModel(chat_model_profile);
@@ -260,7 +262,7 @@ export class Prompter {
 
         if (prompt.includes('$LONGTERM')) {
             if (this.profile.longterm_thinking && this.profile.longterm_thinking.trim().length > 0) {
-                prompt = prompt.replaceAll('$LONGTERM', "## Long-Term Thiking:\n" + this.profile.longterm_thinking);
+                prompt = prompt.replaceAll('$LONGTERM', "## Long-Term Thinking:\n" + this.profile.longterm_thinking);
             } else {
                 prompt = prompt.replaceAll('$LONGTERM', "");
             }
@@ -268,7 +270,7 @@ export class Prompter {
 
         if (prompt.includes('$SHORTTERM')) {
             if (this.profile.shortterm_thinking && this.profile.shortterm_thinking.trim().length > 0) {
-                prompt = prompt.replaceAll('$SHORTTERM', "## Short-Term Thiking:\n" + this.profile.shortterm_thinking);
+                prompt = prompt.replaceAll('$SHORTTERM', "## Short-Term Thinking:\n" + this.profile.shortterm_thinking);
             } else {
                 prompt = prompt.replaceAll('$SHORTTERM', "");
             }
@@ -424,6 +426,8 @@ export class Prompter {
     async logLLMResponse(message, response, response_type) {
         const logPath = './bots/llm_responses.json';
 
+        const escapedResponse = response.replace(/\n/g, '\\n');
+
         const entry = {
             message,
             response,
@@ -434,16 +438,14 @@ export class Prompter {
 
         try {
         const fileContents = readFileSync(logPath, 'utf8');
-        data = JSON.parse(fileContents);
+        data = JSON.parse(fileContents || '[]');
         } catch (err) {
         console.error('Error parsing JSON:', err);
         }
 
         data.push(entry);
 
-        const jsonString = JSON.stringify(data, null, 2).replace(/\\n/g, '\n');
-
-        writeFileSync(logPath, jsonString, 'utf8');
+        writeFileSync(logPath, data, 'utf8');
         console.log('Logged response with readable newlines.');
     }
 }
