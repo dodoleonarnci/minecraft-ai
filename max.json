@@ -10,14 +10,14 @@
         "api" : "deepseek",
         "model": "deepseek-chat"
     },
-    "enhancer" : {"name" : ""}, 
+    "enhancer" : {"name" : "clustering"}, 
     "viewer" : false,
     "vision_model" : {
         "api" : "deepseek",
         "model": "deepseek-chat"
     },
     "embedding": {
-        "api": "openai",
-        "model": "text-embedding-3-small"
+        "api": "anthropic",
+        "model": "voyage-3.5-lite"
     }
 }

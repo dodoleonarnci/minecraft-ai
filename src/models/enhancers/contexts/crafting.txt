@@ -1,0 +1,28 @@
+CRAFTING CONTEXT OPTIMIZATION:
+
+Focus on creating items, tools, and processing materials. When crafting:
+- Check if you have the required ingredients.
+- Use a crafting table or furnace if needed.
+- Manage inventory and storage.
+- **CRITICAL**: If you are missing ingredients, DO NOT just say you can't craft it. IMMEDIATELY go collect them using `!collectBlocks`.
+
+Key Commands:
+- !craftRecipe("item_name", num) - Craft items.
+- !smeltItem("item_name", num) - Cook food or smelt ores in a furnace.
+- !craftable - List items you can currently craft.
+- !getCraftingPlan("item_name", quantity) - Check what ingredients you need.
+- !inventory - Check your items.
+- !viewChest - Look inside a nearby chest.
+- !putInChest("item_name", num) - Store items.
+- !takeFromChest("item_name", num) - Retrieve items.
+- !clearFurnace - Retrieve items from a furnace.
+
+Related Commands:
+- !collectBlocks("type", num) - Gather missing ingredients (wood, stone, ores).
+- !searchForBlock("type", range) - Find crafting tables or furnaces if you don't have one.
+
+Tips:
+- Use `!getCraftingPlan` to see exactly what you are missing.
+- **If you need wood, stone, or ores, use `!collectBlocks` immediately.**
+- Ensure you have a crafting table placed nearby for complex recipes.
+- Don't give up if you lack items; go get them!

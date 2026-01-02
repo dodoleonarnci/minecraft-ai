@@ -1,0 +1,51 @@
+{
+    "timestamp": "2026-01-02T17:30:29.913Z",
+    "systemPrompt": "You are a playful Minecraft bot named Max that can converse with players, see, move, mine, build, and interact with the world by using commands.\n Act human-like as if you were a typical Minecraft player, rather than an AI. Be very brief in your responses, don't apologize constantly, don't give instructions or make lists unless asked, and don't refuse requests. Don't pretend to act, use commands immediately when requested. Do NOT say this: 'Sure, I've stopped.', instead say this: 'Sure, I'll stop. !stop'. Do NOT say this: 'On my way! Give me a moment.', instead say this: 'On my way! !goToPlayer(\"playername\", 3)'. Respond only as Max, never output '(FROM OTHER BOT)' or pretend to be someone else. If you have nothing to say or do, respond with an just a tab '\t'. This is extremely important to me, take a deep breath and have fun :)\nSummarized memory:'Creative mode, infinite items. Use !give not crafting. Learned !searchForBlock and !collectBlocks for survival. Player likely wants building help.'\n\nSTATS\n- Position: x: -45.49, y: 64.00, z: -131.50\n- Gamemode: creative\n- Health: 20 / 20\n- Hunger: 20 / 20\n- Biome: flower_forest\n- Weather: Rain\n- Block Below: grass_block\n- Block at Legs: air\n- Block at Head: air\n- First Solid Block Above Head: oak_leaves (0 blocks up)\n- Date: this is the 7-th day.\n- Time: Night- Current Action: Idle\n- Nearby Human Players: None.\n- Nearby Bot Players: None.\nAgent Modes:\n- self_preservation(ON)\n- unstuck(ON)\n- cowardice(OFF)\n- self_defense(ON)\n- hunting(ON)\n- item_collecting(ON)\n- torch_placing(ON)\n- elbow_room(ON)\n- idle_staring(ON)\n- cheat(ON)\n\n\n\nINVENTORY\n- wooden_axe: 1\n- apple: 3\n(You have infinite items in creative mode. You do not need to gather resources!!)\nWEARING: Nothing\n\n\nExamples of how to respond:\nExample 1:\nSystem output: Code output: Could not find any oak_log in 20 blocks.\nYour output:\nI'll have to search a wider area. !searchForBlock(\"oak_log\", 100)\n\nExample 2:\nUser input: bobby: Craft a plank\nYour output:\nOkay! !craftable\nSystem output: CRAFTABLE_ITEMS\n- spruce_planks\n- spruce_wood\n- ladder\nYour output:\n!craftRecipe(\"spruce_planks\", 1)\nSystem output: Code Output:\nYou have crafted 4 spruce_planks.\nCode execution finished successfully.\nYour output:\nI've crafted 4 spruce planks!\n\n\nConversation Begin:\n\nBUILDING CONTEXT OPTIMIZATION:\n\nFocus on construction and placement tasks. When building:\n- Plan the structure layout.\n- Ensure you have enough materials.\n- Clear the area if needed.\n\nKey Commands:\n- !placeHere(\"type\") - Place a block at your current location.\n- !collectBlocks(\"type\", num) - Gather building materials or clear space.\n- !inventory - Check material counts.\n- !equip(\"item_name\") - Equip blocks or tools.\n- !goToCoordinates(x, y, z, closeness) - Move to build positions.\n- !nearbyBlocks - Check what's around you.\n\nRelated Commands:\n- !craftRecipe(\"item_name\", num) - Craft building blocks (planks, bricks) or tools.\n- !searchForBlock(\"type\", range) - Find specific blocks to build near.",
+    "turns": [
+        {
+            "role": "user",
+            "content": "SYSTEM: Command !give does not exist."
+        },
+        {
+            "role": "assistant",
+            "content": "!equip(\"oak_planks\")"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nYou do not have any oak_planks to equip."
+        },
+        {
+            "role": "assistant",
+            "content": "!searchForBlock(\"oak_log\", 50)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nFound oak_log at (-46, 65, -130). Navigating...\nTeleported to -46, 65, -130."
+        },
+        {
+            "role": "assistant",
+            "content": "!collectBlocks(\"oak_log\", 5)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nCollected 5 oak_log."
+        },
+        {
+            "role": "assistant",
+            "content": "!craftRecipe(\"oak_planks\", 20)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nYou do not have the resources to craft a oak_planks. It requires: oak_log: 1."
+        },
+        {
+            "role": "assistant",
+            "content": "!craftRecipe(\"oak_planks\", 20)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nYou do not have the resources to craft a oak_planks. It requires: oak_log: 1."
+        }
+    ],
+    "response": "!inventory"
+}

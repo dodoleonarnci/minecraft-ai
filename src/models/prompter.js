@@ -17,17 +17,18 @@ import { HuggingFace } from './huggingface.js';
 import { Qwen } from "./qwen.js";
 import { Doubao } from "./doubao.js";
 import { Pollinations } from "./pollinations.js";
+import { Grok } from "./grok.js";
 import { DeepSeek } from './deepseek.js';
 import { Hyperbolic } from './hyperbolic.js';
 import { GLHF } from './glhf.js';
 import { OpenRouter } from './openrouter.js';
-import { generalEnhancer} from './enhancers/enhancer_generic.js'
+import { Enhancer } from './enhancers/enhancer.js';
+import { ClusteringEnhancer } from './enhancers/ClusteringEnhancer.js';
 
 export class Prompter {
     constructor(agent, fp) {
         this.agent = agent;
         this.profile = JSON.parse(readFileSync(fp, 'utf8'));
-
         let default_profile = JSON.parse(readFileSync('./profiles/defaults/_default.json', 'utf8'));
         let base_fp = settings.base_profile;
         let base_profile = JSON.parse(readFileSync(base_fp, 'utf8'));
@@ -46,7 +47,7 @@ export class Prompter {
 
         this.convo_examples = null;
         this.coding_examples = null;
-        
+
         let name = this.profile.name;
         this.cooldown = this.profile.cooldown ? this.profile.cooldown : 0;
         this.last_prompt_time = 0;
@@ -56,8 +57,6 @@ export class Prompter {
         let max_tokens = null;
         if (this.profile.max_tokens)
             max_tokens = this.profile.max_tokens;
-
-        this.enhancer = new generalEnhancer(this.profile);
 
         let chat_model_profile = this._selectAPI(this.profile.model);
         this.chat_model = this._createModel(chat_model_profile);
@@ -81,12 +80,12 @@ export class Prompter {
         let embedding = this.profile.embedding;
         if (embedding === undefined) {
             if (chat_model_profile.api !== 'ollama')
-                embedding = {api: chat_model_profile.api};
+                embedding = { api: chat_model_profile.api };
             else
-                embedding = {api: 'none'};
+                embedding = { api: 'none' };
         }
         else if (typeof embedding === 'string' || embedding instanceof String)
-            embedding = {api: embedding};
+            embedding = { api: embedding };
 
         console.log('Using embedding settings:', embedding);
 
@@ -120,6 +119,9 @@ export class Prompter {
             console.log('Continuing anyway, using word-overlap instead.');
             this.embedding_model = null;
         }
+
+        this.enhancer = this._createEnhancer(this.profile.enhancer);
+
         this.skill_libary = new SkillLibrary(agent, this.embedding_model);
         mkdirSync(`./bots/${name}`, { recursive: true });
         writeFileSync(`./bots/${name}/last_profile.json`, JSON.stringify(this.profile, null, 4), (err) => {
@@ -128,12 +130,27 @@ export class Prompter {
             }
             console.log("Copy profile saved.");
         });
-        
+
+    }
+
+    _createEnhancer(profile) {
+        if (profile && profile.name) {
+            if (profile.name == "mc_ai-enchancer") {
+                return new Enhancer(profile);
+            } else if (profile.name === "clustering") {
+                return new ClusteringEnhancer(profile, this.agent);
+            } else {
+                console.log("Invalid enhancer name. Use default enhancer.");
+                return new Enhancer(profile);
+            }
+        }
+        console.log("Missing enhancer. Use default enhancer.");
+        return new Enhancer(profile);
     }
 
     _selectAPI(profile) {
         if (typeof profile === 'string' || profile instanceof String) {
-            profile = {model: profile};
+            profile = { model: profile };
         }
         if (!profile.api) {
             if (profile.model.includes('openrouter/'))
@@ -142,7 +159,7 @@ export class Prompter {
                 profile.api = 'ollama'; // also must do early because shares names with other models
             else if (profile.model.includes('gemini'))
                 profile.api = 'google';
-            else if (profile.model.includes('gpt') || profile.model.includes('o1')|| profile.model.includes('o3'))
+            else if (profile.model.includes('gpt') || profile.model.includes('o1') || profile.model.includes('o3'))
                 profile.api = 'openai';
             else if (profile.model.includes('claude'))
                 profile.api = 'anthropic';
@@ -168,9 +185,9 @@ export class Prompter {
                 profile.api = 'xai';
             else if (profile.model.includes('deepseek'))
                 profile.api = 'deepseek';
-	          else if (profile.model.includes('mistral'))
+            else if (profile.model.includes('mistral'))
                 profile.api = 'mistral';
-            else 
+            else
                 throw new Error('Unknown model:', profile.model);
         }
         return profile;
@@ -187,6 +204,8 @@ export class Prompter {
             model = new ReplicateAPI(profile.model.replace('replicate/', ''), profile.url, profile.params);
         else if (profile.api === 'ollama')
             model = new Local(profile.model.replace('ollama/', ''), profile.url, profile.params);
+        else if (profile.api === 'ollama-agent')
+            model = new LocalAgent(profile.model.replace('ollama/', ''), profile.url, profile.params);
         else if (profile.api === 'mistral')
             model = new Mistral(profile.model, profile.url, profile.params);
         else if (profile.api === 'groq')
@@ -219,7 +238,7 @@ export class Prompter {
     getName() {
         return this.profile.name;
     }
-    
+
     getInitModes() {
         return this.profile.modes;
     }
@@ -228,13 +247,17 @@ export class Prompter {
         try {
             this.convo_examples = new Examples(this.embedding_model, settings.num_examples);
             this.coding_examples = new Examples(this.embedding_model, settings.num_examples);
-            
+
             // Wait for both examples to load before proceeding
-            await Promise.all([
+            let promises = [
                 this.convo_examples.load(this.profile.conversation_examples),
                 this.coding_examples.load(this.profile.coding_examples),
                 this.skill_libary.initSkillLibrary()
-            ]).catch(error => {
+            ];
+            if (this.enhancer.init) {
+                promises.push(this.enhancer.init());
+            }
+            await Promise.all(promises).catch(error => {
                 // Preserve error details
                 console.error('Failed to initialize examples. Error details:', error);
                 console.error('Stack trace:', error.stack);
@@ -249,9 +272,9 @@ export class Prompter {
         }
     }
 
-    async replaceStrings(prompt, messages, examples=null, to_summarize=[], last_goals=null) {
+    async replaceStrings(prompt, messages, examples = null, to_summarize = [], last_goals = null) {
         prompt = prompt.replaceAll('$NAME', this.agent.name);
-        
+
         if (prompt.includes('$PERSON_DESC')) {
             if (this.profile.person_desc && this.profile.person_desc.trim().length > 0) {
                 prompt = prompt.replaceAll('$PERSON_DESC', this.profile.person_desc);
@@ -278,7 +301,7 @@ export class Prompter {
 
         if (prompt.includes('$TODO')) {
             if (this.agent.thinking.todo_list.length > 0) {
-                let todo_list = "-" + this.agent.thinking.todo_list.join("\n-"); 
+                let todo_list = "-" + this.agent.thinking.todo_list.join("\n-");
                 prompt = prompt.replaceAll('$TODO', "## TODO List:\n" + todo_list);
             } else {
                 prompt = prompt.replaceAll('$TODO', "");
@@ -296,8 +319,13 @@ export class Prompter {
         if (prompt.includes('$ACTION')) {
             prompt = prompt.replaceAll('$ACTION', this.agent.actions.currentActionLabel);
         }
-        if (prompt.includes('$COMMAND_DOCS'))
-            prompt = prompt.replaceAll('$COMMAND_DOCS', getCommandDocs());
+        if (prompt.includes('$COMMAND_DOCS')) {
+            if (this.enhancer.suppressGlobalDocs) {
+                prompt = prompt.replaceAll('$COMMAND_DOCS', "");
+            } else {
+                prompt = prompt.replaceAll('$COMMAND_DOCS', getCommandDocs());
+            }
+        }
         if (prompt.includes('$CODE_DOCS')) {
             const code_task_content = messages.slice().reverse().find(msg =>
                 msg.role !== 'system' && msg.content.includes('!newAction(')
@@ -334,7 +362,7 @@ export class Prompter {
             prompt = prompt.replaceAll('$LAST_GOALS', goal_text.trim());
         }
 
-        // In mindcraft, the $BLUEPRINTS is used to show the construcctions of the npc.
+        // the $BLUEPRINTS is used to show the construcctions of the npc.
         if (prompt.includes('$BLUEPRINTS')) {
             if (this.agent.npc.constructions) {
                 let blueprints = '';
@@ -352,7 +380,7 @@ export class Prompter {
         }
         return prompt.trim();
     }
-    
+
     async checkCooldown() {
         let elapsed = Date.now() - this.last_prompt_time;
         if (elapsed < this.cooldown && this.cooldown > 0) {
@@ -371,8 +399,7 @@ export class Prompter {
             }
             let prompt = this.profile.conversing;
             prompt = await this.replaceStrings(prompt, messages, this.convo_examples);
-            let generation = await this.chat_model.sendRequest(messages, prompt);
-            this.logLLMResponse("Convo", prompt, generation);
+            let generation = await this.enhancer.sendRequest(this.chat_model, messages, prompt);
             // in conversations >2 players LLMs tend to hallucinate and role-play as other bots
             // the FROM OTHER BOT tag should never be generated by the LLM
             if (generation.includes('(FROM OTHER BOT)')) {
@@ -397,8 +424,7 @@ export class Prompter {
         await this.checkCooldown();
         let prompt = this.profile.coding;
         prompt = await this.replaceStrings(prompt, messages, this.coding_examples);
-        let resp = await this.code_model.sendRequest(messages, prompt);
-        this.logLLMResponse("Coding", prompt, resp);
+        let resp = await this.enhancer.sendRequest(this.code_model, messages, prompt);
         this.awaiting_coding = false;
         return resp;
     }
@@ -407,45 +433,16 @@ export class Prompter {
         await this.checkCooldown();
         let prompt = this.profile.saving_memory;
         prompt = await this.replaceStrings(prompt, null, null, to_summarize);
-        let generation = await this.chat_model.sendRequest([], prompt)
-        this.logLLMResponse("MemSaving", prompt, generation);
-        return generation;
+        return await this.enhancer.sendRequest(this.chat_model, [], prompt);
     }
 
     async promptShouldRespondToBot(new_message) {
         await this.checkCooldown();
         let prompt = this.profile.bot_responder;
         let messages = this.agent.history.getHistory();
-        messages.push({role: 'user', content: new_message});
+        messages.push({ role: 'user', content: new_message });
         prompt = await this.replaceStrings(prompt, null, null, messages);
-        let res = await this.chat_model.sendRequest([], prompt);
-        this.logLLMResponse("ShouldRespondToBot", prompt, res);
+        let res = await this.enhancer.sendRequest(this.chat_model, [], prompt);
         return res.trim().toLowerCase() === 'respond';
-    }
-
-    async logLLMResponse(message, response, response_type) {
-        const logPath = './bots/llm_responses.json';
-
-        const escapedResponse = response.replace(/\n/g, '\\n');
-
-        const entry = {
-            message,
-            response,
-            timestamp: new Date().toISOString()
-        };
-
-        let data = [];
-
-        try {
-        const fileContents = readFileSync(logPath, 'utf8');
-        data = JSON.parse(fileContents || '[]');
-        } catch (err) {
-        console.error('Error parsing JSON:', err);
-        }
-
-        data.push(entry);
-
-        writeFileSync(logPath, data, 'utf8');
-        console.log('Logged response with readable newlines.');
     }
 }

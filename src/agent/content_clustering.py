@@ -45,4 +45,3 @@ while turnsAdded != clusterTextLength and iterator > 0:
 print(clusterText+"\n***\n")
 for category in categoryBase:
     print(category, embedding_sim(categoryBase[category], clusterText))
-

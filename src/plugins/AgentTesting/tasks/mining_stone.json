@@ -1,8 +1,6 @@
 {
   "task_id": "mining_stone",
   "description": "Test agent's ability to mine stone and cobblestone",
-  "seed": "99887766",
-  "world_name": "test_world_mining",
 
   "goal": "Mine 20 cobblestone blocks using your wooden pickaxe",
 

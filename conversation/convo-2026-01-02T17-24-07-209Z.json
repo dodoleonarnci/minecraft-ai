@@ -1,0 +1,43 @@
+{
+    "timestamp": "2026-01-02T17:24:07.209Z",
+    "systemPrompt": "You are a playful Minecraft bot named Max that can converse with players, see, move, mine, build, and interact with the world by using commands.\n Act human-like as if you were a typical Minecraft player, rather than an AI. Be very brief in your responses, don't apologize constantly, don't give instructions or make lists unless asked, and don't refuse requests. Don't pretend to act, use commands immediately when requested. Do NOT say this: 'Sure, I've stopped.', instead say this: 'Sure, I'll stop. !stop'. Do NOT say this: 'On my way! Give me a moment.', instead say this: 'On my way! !goToPlayer(\"playername\", 3)'. Respond only as Max, never output '(FROM OTHER BOT)' or pretend to be someone else. If you have nothing to say or do, respond with an just a tab '\t'. This is extremely important to me, take a deep breath and have fun :)\nSummarized memory:'Player wants oak planks. In creative, can place directly; crafting not needed. Remember creative mode bypasses resource gathering.'\n\nSTATS\n- Position: x: 95.50, y: 67.00, z: -204.50\n- Gamemode: creative\n- Health: 20 / 20\n- Hunger: 20 / 20\n- Biome: sunflower_plains\n- Weather: Clear\n- Block Below: oak_planks\n- Block at Legs: oak_planks\n- Block at Head: air\n- First Solid Block Above Head: stone (3 blocks up)\n- Date: this is the 7-th day.\n- Time: Afternoon- Current Action: Idle\n- Nearby Human Players: dodoleonarnci\n- Nearby Bot Players: None.\nAgent Modes:\n- self_preservation(ON)\n- unstuck(ON)\n- cowardice(OFF)\n- self_defense(ON)\n- hunting(ON)\n- item_collecting(ON)\n- torch_placing(ON)\n- elbow_room(ON)\n- idle_staring(ON)\n- cheat(ON)\n\n\n\nINVENTORY\n- wooden_axe: 1\n- apple: 3\n(You have infinite items in creative mode. You do not need to gather resources!!)\nWEARING: Nothing\n\n\nExamples of how to respond:\nExample 1:\nSystem output: Code output: Placed oak_planks at (-154, 96, -228).\nYour output:\nI've placed an oak plank for the house. Wait, I should use newAction to build complicated structures! !newAction(\"Build a house with oak planks\")\n\nExample 2:\nSystem output: work together with the other bot to build a house\nYour output:\n!startConversation(\"terrance\", \"Hey gpt! Let's work together to build a house. Let's build it at x:942, y:54, z:1355\"))\nUser input: terrance: (FROM OTHER BOT)I can build the base, you can build the walls.  !newAction(\"Build a 10x10 wall of a house at x:942, y:54, z:1355\")\n\n\nConversation Begin:\n\nBUILDING CONTEXT OPTIMIZATION:\n\nFocus on construction and placement tasks. When building:\n- Plan the structure layout.\n- Ensure you have enough materials.\n- Clear the area if needed.\n\nKey Commands:\n- !placeHere(\"type\") - Place a block at your current location.\n- !collectBlocks(\"type\", num) - Gather building materials or clear space.\n- !inventory - Check material counts.\n- !equip(\"item_name\") - Equip blocks or tools.\n- !goToCoordinates(x, y, z, closeness) - Move to build positions.\n- !nearbyBlocks - Check what's around you.\n\nRelated Commands:\n- !craftRecipe(\"item_name\", num) - Craft building blocks (planks, bricks) or tools.\n- !searchForBlock(\"type\", range) - Find specific blocks to build near.",
+    "turns": [
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nUsed /setblock to place oak_planks at (95, 65, -205)."
+        },
+        {
+            "role": "assistant",
+            "content": "!goToCoordinates(95, 70, -205, 1)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nTeleported to 95, 70, -205."
+        },
+        {
+            "role": "assistant",
+            "content": "!placeHere(\"oak_planks\")"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nUsed /setblock to place oak_planks at (95, 66, -205)."
+        },
+        {
+            "role": "assistant",
+            "content": "!goToCoordinates(95, 71, -205, 1)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nTeleported to 95, 71, -205."
+        },
+        {
+            "role": "assistant",
+            "content": "!placeHere(\"oak_planks\")"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nUsed /setblock to place oak_planks at (95, 67, -205)."
+        }
+    ],
+    "response": "!goToCoordinates(95, 72, -205, 1)"
+}

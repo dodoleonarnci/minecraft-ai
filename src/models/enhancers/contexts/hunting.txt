@@ -1,0 +1,20 @@
+HUNTING CONTEXT OPTIMIZATION:
+
+Focus on combat, defense, and gathering food from mobs. When hunting:
+- Equip your best weapon and armor.
+- Locate targets.
+- Manage health and hunger.
+
+Key Commands:
+- !attack("entity_type", kill_boolean) - Attack a mob (e.g., "zombie", "sheep").
+- !attackPlayer("player_name", kill_boolean) - Attack a player (use with caution).
+- !searchForEntity("type", range) - Find mobs or players.
+- !entities - List nearby entities.
+- !equip("item_name") - Equip sword, axe, or armor.
+- !consume("item_name") - Eat food to heal.
+- !stats - Check health and hunger.
+
+Related Commands:
+- !collectBlocks("type", num) - Gather blocks to build defenses.
+- !craftRecipe("item_name", num) - Craft weapons or armor.
+- !goToBed - Sleep to skip the night/set spawn.

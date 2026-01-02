@@ -7,13 +7,12 @@ const settings = {
     // the mindserver manages all agents and hosts the UI
     "host_mindserver": false, // if true, the mindserver will be hosted on this machine. otherwise, specify a public IP address
     "mindserver_host": "localhost",
-    "mindserver_port": 8080,
-    "proxyserver_port": 8081,
+    "mindserver_port": 8082,
+    "proxyserver_port": 8083,
     
     // the base profile is shared by all bots for default prompts/examples/modes
     "base_profile": "./profiles/defaults/survival.json", // survival.json, creative.json, god_mode.json
     "profiles": [
-        "./lucy.json",
         "./max.json"
         // if you are using more than 1 profile, then 
         // - you can use /msg or @botname in order to talk to each bot indivually
@@ -36,7 +35,7 @@ const settings = {
     "verbose_commands": true, // show full command syntax
     "narrate_behavior": true, // chat simple automatic actions ('Picking up item!')
     "chat_bot_messages": true, // publicly chat messages to other bots
-    "plugins" : [], // plugin will be loaded if and only if it's name appears here
+    "plugins" : ["AgentTesting"], // plugin will be loaded if and only if it's name appears here
 }
 
 // these environment variables override certain settings

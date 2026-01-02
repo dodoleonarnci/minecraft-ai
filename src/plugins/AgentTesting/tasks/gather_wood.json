@@ -1,8 +1,6 @@
 {
   "task_id": "gather_wood",
   "description": "Test agent's ability to gather wood and craft planks",
-  "seed": "12345678",
-  "world_name": "test_world_forest",
 
   "goal": "Gather 10 oak logs and craft them into 40 oak planks",
 
@@ -14,8 +12,8 @@
   },
 
   "teleport_coordinates": {
-    "x": 100,
-    "y": 64,
+    "x": 10,
+    "y": 84,
     "z": -200,
     "dimension": "overworld"
   },

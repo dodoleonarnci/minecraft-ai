@@ -1,0 +1,18 @@
+BUILDING CONTEXT OPTIMIZATION:
+
+Focus on construction and placement tasks. When building:
+- Plan the structure layout.
+- Ensure you have enough materials.
+- Clear the area if needed.
+
+Key Commands:
+- !placeHere("type") - Place a block at your current location.
+- !collectBlocks("type", num) - Gather building materials or clear space.
+- !inventory - Check material counts.
+- !equip("item_name") - Equip blocks or tools.
+- !goToCoordinates(x, y, z, closeness) - Move to build positions.
+- !nearbyBlocks - Check what's around you.
+
+Related Commands:
+- !craftRecipe("item_name", num) - Craft building blocks (planks, bricks) or tools.
+- !searchForBlock("type", range) - Find specific blocks to build near.

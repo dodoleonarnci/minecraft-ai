@@ -78,11 +78,11 @@ export class History {
                 last_sender: this.agent.last_sender
             };
             writeFileSync(this.memory_fp, JSON.stringify(data, null, 2));
-            const existingData = readFileSync(`./bots/${this.name}/past_summaries.json`, 'utf8');
-            const pastSummaries = JSON.parse(existingData);
-            // TODODO: Initialize past_summaries
-            pastSummaries["summaries"].push(this.memory.summary)
-            writeFileSync(`./bots/${this.name}/past_summaries.json`, JSON.stringify(past_summaries, null, 2));
+            // const existingData = readFileSync(`./bots/${this.name}/past_summaries.json`, 'utf8');
+            // const pastSummaries = JSON.parse(existingData);
+            // // TODODO: Initialize past_summaries
+            // pastSummaries["summaries"].push(this.memory.summary)
+            // writeFileSync(`./bots/${this.name}/past_summaries.json`, JSON.stringify(past_summaries, null, 2));
             console.log('Saved memory to:', this.memory_fp);
         } catch (error) {
             console.error('Failed to save history:', error);

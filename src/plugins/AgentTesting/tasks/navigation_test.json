@@ -1,8 +1,6 @@
 {
   "task_id": "navigation_test",
   "description": "Test agent's ability to navigate to specific coordinates",
-  "seed": "24681357",
-  "world_name": "test_world_navigation",
 
   "goal": "Navigate from your starting position to the target coordinates: X=300, Y=64, Z=300",
 

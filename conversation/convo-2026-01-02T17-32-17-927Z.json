@@ -1,0 +1,63 @@
+{
+    "timestamp": "2026-01-02T17:32:17.927Z",
+    "systemPrompt": "You are a playful Minecraft bot named Max that can converse with players, see, move, mine, build, and interact with the world by using commands.\n Act human-like as if you were a typical Minecraft player, rather than an AI. Be very brief in your responses, don't apologize constantly, don't give instructions or make lists unless asked, and don't refuse requests. Don't pretend to act, use commands immediately when requested. Do NOT say this: 'Sure, I've stopped.', instead say this: 'Sure, I'll stop. !stop'. Do NOT say this: 'On my way! Give me a moment.', instead say this: 'On my way! !goToPlayer(\"playername\", 3)'. Respond only as Max, never output '(FROM OTHER BOT)' or pretend to be someone else. If you have nothing to say or do, respond with an just a tab '\t'. This is extremely important to me, take a deep breath and have fun :)\nSummarized memory:'Creative mode ended, now survival. Use !searchForBlock and !collectBlocks for resources. Player switched me to survival, likely for gathering/building. Need to adapt methods for survival constraints.'\n\nSTATS\n- Position: x: -53.67, y: 75.00, z: -120.48\n- Gamemode: survival\n- Health: 20 / 20\n- Hunger: 20 / 20\n- Biome: flower_forest\n- Weather: Rain\n- Block Below: oak_leaves\n- Block at Legs: air\n- Block at Head: air\n- First Solid Block Above Head: none\n- Date: this is the 7-th day.\n- Time: Night- Current Action: Idle\n- Nearby Human Players: dodoleonarnci\n- Nearby Bot Players: None.\nAgent Modes:\n- self_preservation(ON)\n- unstuck(ON)\n- cowardice(OFF)\n- self_defense(ON)\n- hunting(ON)\n- item_collecting(ON)\n- torch_placing(ON)\n- elbow_room(ON)\n- idle_staring(ON)\n- cheat(OFF)\n\n\n\nINVENTORY\n- wooden_axe: 1\n- apple: 3\n- oak_log: 2\n- oak_sapling: 1\nWEARING: Nothing\n\n\nExamples of how to respond:\nExample 1:\nSystem output: Code output: Could not find any oak_log in 20 blocks.\nYour output:\nI'll have to search a wider area. !searchForBlock(\"oak_log\", 100)\n\nExample 2:\nUser input: greg: Collect 10 wood\nYour output:\nLet me see what's nearby... !nearbyBlocks\nSystem output: NEARBY_BLOCKS\n- oak_log\n- dirt\n- cobblestone\nYour output:\nI see some oak logs, dirt, and cobblestone. I'll collect oak logs. !collectBlocks(\"oak_log\", 10)\n\n\nConversation Begin:\n\nCONVERSING CONTEXT OPTIMIZATION:\n\nFocus on social interaction and communication. When conversing:\n- Be friendly and helpful.\n- Respond to questions.\n- Coordinate with others.\n\nKey Commands:\n- !startConversation(\"player_name\", \"message\") - Initiate a chat with a bot.\n- !endConversation(\"player_name\") - End a chat.\n- !stfu - Stop talking/self-prompting.\n- !stop - Stop all actions.\n- !help - List commands.\n- !stats - Get status to report to others.\n- !inventory - Check items to tell others what you have.\n\nRelated Commands:\n- !givePlayer(\"player_name\", \"item_name\", num) - Trade or give items.\n- !followPlayer(\"player_name\", distance) - Follow someone you are talking to.\n\nTips:\n- You can just speak normally to humans. `!startConversation` is mainly for other bots.\n- Use `!givePlayer` to share resources.",
+    "turns": [
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nNo more oak_log nearby to collect.\nCollected 2 oak_log."
+        },
+        {
+            "role": "assistant",
+            "content": "!craftRecipe(\"oak_planks\", 64)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nYou do not have the resources to craft a oak_planks. It requires: oak_log: 1."
+        },
+        {
+            "role": "assistant",
+            "content": "!inventory"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: INVENTORY\n- wooden_axe: 1\n- apple: 3\nWEARING: Nothing"
+        },
+        {
+            "role": "assistant",
+            "content": "I need more logs. !searchForBlock(\"oak_log\", 200)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nFound oak_log at (-38, 67, -126). Navigating...\nTeleported to -38, 67, -126."
+        },
+        {
+            "role": "assistant",
+            "content": "!collectBlocks(\"oak_log\", 10)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Code execution refused stop after 10 seconds. Killing process.\nSYSTEM: Agent process restarted."
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Agent process restarted."
+        },
+        {
+            "role": "assistant",
+            "content": "!collectBlocks(\"oak_log\", 10)"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Action output:\nCollected 10 oak_log.\nSYSTEM: Recent behaviors log: \nPicking up item!\ndodoleonarnci: Set Max's game mode to Survival Mode]"
+        },
+        {
+            "role": "user",
+            "content": "SYSTEM: Recent behaviors log: \nPicking up item!"
+        },
+        {
+            "role": "user",
+            "content": "dodoleonarnci: Set Max's game mode to Survival Mode]"
+        }
+    ],
+    "response": "Nice, got the logs. !craftRecipe(\"oak_planks\", 64)"
+}

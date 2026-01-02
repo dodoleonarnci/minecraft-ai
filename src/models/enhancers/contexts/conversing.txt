@@ -1,0 +1,23 @@
+CONVERSING CONTEXT OPTIMIZATION:
+
+Focus on social interaction and communication. When conversing:
+- Be friendly and helpful.
+- Respond to questions.
+- Coordinate with others.
+
+Key Commands:
+- !startConversation("player_name", "message") - Initiate a chat with a bot.
+- !endConversation("player_name") - End a chat.
+- !stfu - Stop talking/self-prompting.
+- !stop - Stop all actions.
+- !help - List commands.
+- !stats - Get status to report to others.
+- !inventory - Check items to tell others what you have.
+
+Related Commands:
+- !givePlayer("player_name", "item_name", num) - Trade or give items.
+- !followPlayer("player_name", distance) - Follow someone you are talking to.
+
+Tips:
+- You can just speak normally to humans. `!startConversation` is mainly for other bots.
+- Use `!givePlayer` to share resources.

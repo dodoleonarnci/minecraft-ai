@@ -1,8 +1,6 @@
 {
   "task_id": "smelting_iron",
   "description": "Test agent's ability to smelt iron ore into iron ingots",
-  "seed": "55667788",
-  "world_name": "test_world_smelting",
 
   "goal": "Smelt 5 raw iron into iron ingots using the furnace and coal provided",
 

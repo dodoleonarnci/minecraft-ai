@@ -1,8 +1,6 @@
 {
   "task_id": "craft_tools",
   "description": "Test agent's ability to craft a complete set of wooden tools",
-  "seed": "11223344",
-  "world_name": "test_world_tools",
 
   "goal": "Craft a complete set of wooden tools: pickaxe, axe, sword, shovel, and hoe",
 

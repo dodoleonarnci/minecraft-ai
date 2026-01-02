@@ -1,0 +1,21 @@
+COLLECTING CONTEXT OPTIMIZATION:
+
+Focus on resource gathering and mining. When collecting:
+- Identify the target resource (wood, stone, ores, etc.)
+- Use appropriate tools for efficiency
+- Navigate to resource-rich areas
+- Monitor inventory space
+- Consider what resources are needed for current goals
+
+Key Commands:
+- !collectBlocks("type", num) - Mine/chop specific block types. NOTE: Plural "Blocks".
+- !searchForBlock("type", range) - Find location of nearest block.
+- !nearbyBlocks - List blocks around you.
+- !inventory - Check available space and tools.
+- !equip("item_name") - Equip a tool (pickaxe, axe, shovel).
+- !goToCoordinates(x, y, z, closeness) - Travel to resource locations.
+- !digDown(distance) - Dig straight down (use with caution).
+
+Related Commands:
+- !craftRecipe("item_name", num) - Craft tools if yours break.
+- !placeHere("type") - Place torches or scaffolding.

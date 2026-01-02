@@ -1,8 +1,6 @@
 {
   "task_id": "food_gathering",
   "description": "Test agent's ability to gather and prepare food",
-  "seed": "13579246",
-  "world_name": "test_world_food",
 
   "goal": "Kill animals and collect at least 10 pieces of raw meat (any type)",
 
