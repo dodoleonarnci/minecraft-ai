@@ -24,6 +24,7 @@ import { GLHF } from './glhf.js';
 import { OpenRouter } from './openrouter.js';
 import { Enhancer } from './enhancers/enhancer.js';
 import { ClusteringEnhancer } from './enhancers/ClusteringEnhancer.js';
+import { SoftClusteringEnhancer } from './enhancers/SoftClusteringEnhancer.js';
 
 export class Prompter {
     constructor(agent, fp) {
@@ -139,6 +140,8 @@ export class Prompter {
                 return new Enhancer(profile);
             } else if (profile.name === "clustering") {
                 return new ClusteringEnhancer(profile, this.agent);
+            } else if (profile.name === "soft-clustering") {
+                return new SoftClusteringEnhancer(profile, this.agent);
             } else {
                 console.log("Invalid enhancer name. Use default enhancer.");
                 return new Enhancer(profile);

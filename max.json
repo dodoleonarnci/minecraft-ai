@@ -10,7 +10,13 @@
         "api" : "deepseek",
         "model": "deepseek-chat"
     },
-    "enhancer" : {"name" : "clustering"}, 
+    "enhancer": {
+        "name": "soft-clustering",
+        "topK": 10,
+        "relevanceWeight": 0.7,
+        "semanticWeight": 0.3, 
+        "customMatrixPath": "./default_relevance_matrix.json"
+    },
     "viewer" : false,
     "vision_model" : {
         "api" : "deepseek",

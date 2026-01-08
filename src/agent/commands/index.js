@@ -236,7 +236,6 @@ export async function executeCommand(agent, message) {
     }
 }
 
-// TODODO: add optional command filter
 export function getCommandDocs() {
     const typeTranslations = {
         //This was added to keep the prompt the same as before type checks were implemented.
