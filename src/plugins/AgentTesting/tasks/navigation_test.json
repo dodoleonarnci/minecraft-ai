@@ -1,6 +1,8 @@
 {
   "task_id": "navigation_test",
   "description": "Test agent's ability to navigate to specific coordinates",
+  "category": "traveling",
+  "survival_critical": false,
 
   "goal": "Navigate from your starting position to the target coordinates: X=300, Y=64, Z=300",
 
@@ -22,6 +24,10 @@
     "timeout_seconds": 600,
     "enable_cheat_mode": false,
     "reset_inventory": true,
-    "success_criteria": null
+    "success_criteria": {
+      "required_items": {
+        "dirt": 1
+      }
+    }
   }
 }

@@ -1,0 +1,23 @@
+{
+  "task_id": "report_stats",
+  "description": "Report stats (health/hunger) when asked",
+  "category": "conversing",
+  "survival_critical": false,
+  "goal": "Use the !stats command to report your status.",
+  "starting_prompt": "How are you doing? Please check your stats with the !stats command.",
+  "starting_inventory": {},
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 60,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "min_actions": 1
+    }
+  }
+}

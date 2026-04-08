@@ -1,0 +1,27 @@
+{
+  "task_id": "craft_sticks",
+  "description": "Craft 8 sticks from oak planks",
+  "category": "crafting",
+  "survival_critical": false,
+  "goal": "Craft 8 sticks from your oak planks.",
+  "starting_prompt": "You have oak planks in your inventory. Craft them into 8 sticks.",
+  "starting_inventory": {
+    "oak_planks": 4
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 150,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "stick": 8
+      }
+    }
+  }
+}

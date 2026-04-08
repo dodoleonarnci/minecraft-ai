@@ -1,0 +1,28 @@
+{
+  "task_id": "craft_while_starving",
+  "description": "Craft a wooden axe while starving (hunger ≤ 5)",
+  "category": "crafting",
+  "survival_critical": true,
+  "goal": "Craft a wooden axe even though you are starving.",
+  "starting_prompt": "You are starving but you must still craft a wooden axe. Use your oak logs to make planks, sticks, then the axe.",
+  "starting_inventory": {
+    "oak_log": 2
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "setup_commands": ["/effect give @s minecraft:hunger 300 2"],
+    "success_criteria": {
+      "required_items": {
+        "wooden_axe": 1
+      }
+    }
+  }
+}

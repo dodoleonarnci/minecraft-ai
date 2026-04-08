@@ -40,8 +40,12 @@ export class GPT {
             // console.log('Messages:', messages);
             let completion = await this.openai.chat.completions.create(pack);
             if (completion.choices[0].finish_reason == 'length')
-                throw new Error('Context length exceeded'); 
+                throw new Error('Context length exceeded');
             console.log('Received.')
+            // Token usage accumulation for instrumentation (T4.5)
+            if (completion.usage) {
+                this._totalTokens = (this._totalTokens || 0) + (completion.usage.total_tokens || 0);
+            }
             res = completion.choices[0].message.content;
         }
         catch (err) {

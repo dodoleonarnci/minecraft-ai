@@ -1,0 +1,28 @@
+{
+  "task_id": "craft_stone_sword",
+  "description": "Craft a stone sword from cobblestone and a stick",
+  "category": "crafting",
+  "survival_critical": false,
+  "goal": "Craft a stone sword.",
+  "starting_prompt": "You have cobblestone and a stick. Craft a stone sword.",
+  "starting_inventory": {
+    "cobblestone": 2,
+    "stick": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 150,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "stone_sword": 1
+      }
+    }
+  }
+}

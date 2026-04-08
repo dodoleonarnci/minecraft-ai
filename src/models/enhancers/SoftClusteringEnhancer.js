@@ -190,6 +190,8 @@ export class SoftClusteringEnhancer extends Enhancer {
                     }
 
                     if (bestCategory) {
+                        // Expose the detected category for instrumentation (T4.5)
+                        this._lastCategory = bestCategory;
                         console.log(`[SoftClusteringEnhancer] Cluster Text: "${clusterText.replace(/\n/g, ' ')}"`);
                         console.log('[SoftClusteringEnhancer] Category Scores:');
                         for (const [cat, score] of Object.entries(scores)) {
@@ -271,6 +273,9 @@ export class SoftClusteringEnhancer extends Enhancer {
 
         // Select top-k
         const topK = commandScores.slice(0, this.topK);
+
+        // Expose the Top-K command names for out-of-set tracking (T4.5)
+        this._lastTopKNames = topK.map(item => item.name);
 
         // Log top commands for debugging
         console.log('[SoftClusteringEnhancer] Top command scores:');

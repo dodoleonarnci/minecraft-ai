@@ -1,0 +1,27 @@
+{
+  "task_id": "mine_copper_ore",
+  "description": "Mine 4 raw copper from copper ore",
+  "category": "collecting",
+  "survival_critical": false,
+  "goal": "Find and mine 4 copper ore blocks to obtain raw copper.",
+  "starting_prompt": "You need to mine 4 raw copper. Find copper ore and use your stone pickaxe to mine it.",
+  "starting_inventory": {
+    "stone_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 120,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "raw_copper": 4
+      }
+    }
+  }
+}

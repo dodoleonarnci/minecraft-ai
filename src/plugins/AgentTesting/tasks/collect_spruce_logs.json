@@ -1,0 +1,28 @@
+{
+  "task_id": "collect_spruce_logs",
+  "description": "Collect 4 spruce logs from a taiga biome",
+  "category": "collecting",
+  "survival_critical": false,
+  "goal": "Find spruce trees and collect 4 spruce logs.",
+  "starting_prompt": "You need to collect 4 spruce logs. Look for spruce trees nearby and chop them down with your wooden axe.",
+  "starting_inventory": {
+    "wooden_pickaxe": 1,
+    "wooden_axe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 120,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "spruce_log": 4
+      }
+    }
+  }
+}

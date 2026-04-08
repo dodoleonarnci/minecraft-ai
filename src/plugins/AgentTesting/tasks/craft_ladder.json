@@ -1,0 +1,27 @@
+{
+  "task_id": "craft_ladder",
+  "description": "Craft 3 ladders from sticks",
+  "category": "building",
+  "survival_critical": false,
+  "goal": "Craft 3 ladders.",
+  "starting_prompt": "You have 7 sticks. Craft 3 ladders.",
+  "starting_inventory": {
+    "stick": 7
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "ladder": 3
+      }
+    }
+  }
+}

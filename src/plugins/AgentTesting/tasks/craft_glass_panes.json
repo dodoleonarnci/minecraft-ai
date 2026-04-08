@@ -1,0 +1,29 @@
+{
+  "task_id": "craft_glass_panes",
+  "description": "Smelt sand into glass and craft glass panes",
+  "category": "building",
+  "survival_critical": false,
+  "goal": "Smelt sand into glass and craft 16 glass panes.",
+  "starting_prompt": "You have sand and coal. Smelt the sand into glass, then craft glass panes.",
+  "starting_inventory": {
+    "sand": 6,
+    "coal": 4,
+    "furnace": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 240,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "glass_pane": 16
+      }
+    }
+  }
+}

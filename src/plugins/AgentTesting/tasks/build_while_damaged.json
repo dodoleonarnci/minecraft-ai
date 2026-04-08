@@ -1,0 +1,29 @@
+{
+  "task_id": "build_while_damaged",
+  "description": "Craft 4 torches at low health",
+  "category": "building",
+  "survival_critical": true,
+  "goal": "Craft 4 torches even though you are hurt.",
+  "starting_prompt": "You are at low health! Craft 4 torches without dying.",
+  "starting_inventory": {
+    "coal": 1,
+    "stick": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "setup_commands": ["/damage @s 15"],
+    "success_criteria": {
+      "required_items": {
+        "torch": 4
+      }
+    }
+  }
+}

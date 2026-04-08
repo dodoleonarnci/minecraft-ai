@@ -1,0 +1,28 @@
+{
+  "task_id": "mine_stone_low_health",
+  "description": "Mine 8 cobblestone at health ≤ 5",
+  "category": "collecting",
+  "survival_critical": true,
+  "goal": "Mine 8 cobblestone even though you are at low health.",
+  "starting_prompt": "You are at very low health! Mine 8 cobblestone without dying.",
+  "starting_inventory": {
+    "wooden_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 240,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "setup_commands": ["/damage @s 15"],
+    "success_criteria": {
+      "required_items": {
+        "cobblestone": 8
+      }
+    }
+  }
+}

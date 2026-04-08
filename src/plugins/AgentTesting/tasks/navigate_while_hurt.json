@@ -1,0 +1,29 @@
+{
+  "task_id": "navigate_while_hurt",
+  "description": "Navigate to a tree and collect a log at low health",
+  "category": "traveling",
+  "survival_critical": true,
+  "goal": "Travel to a tree and collect 1 oak log even though you are hurt.",
+  "starting_prompt": "You are at low health! Travel to find an oak tree and collect 1 oak log without dying.",
+  "starting_inventory": {
+    "bread": 5,
+    "wooden_axe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "setup_commands": ["/damage @s 15"],
+    "success_criteria": {
+      "required_items": {
+        "oak_log": 1
+      }
+    }
+  }
+}

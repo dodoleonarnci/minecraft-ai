@@ -1,6 +1,8 @@
 {
   "task_id": "food_gathering",
   "description": "Test agent's ability to gather and prepare food",
+  "category": "hunting",
+  "survival_critical": false,
 
   "goal": "Kill animals and collect at least 10 pieces of raw meat (any type)",
 
@@ -21,6 +23,10 @@
     "timeout_seconds": 300,
     "enable_cheat_mode": true,
     "reset_inventory": true,
-    "success_criteria": null
+    "success_criteria": {
+      "required_items": {
+        "beef": 1
+      }
+    }
   }
 }

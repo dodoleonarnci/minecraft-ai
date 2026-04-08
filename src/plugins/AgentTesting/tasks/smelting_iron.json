@@ -1,6 +1,8 @@
 {
   "task_id": "smelting_iron",
   "description": "Test agent's ability to smelt iron ore into iron ingots",
+  "category": "crafting",
+  "survival_critical": false,
 
   "goal": "Smelt 5 raw iron into iron ingots using the furnace and coal provided",
 

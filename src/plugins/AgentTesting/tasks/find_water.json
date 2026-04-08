@@ -1,0 +1,28 @@
+{
+  "task_id": "find_water",
+  "description": "Navigate to water and collect sand from a beach",
+  "category": "traveling",
+  "survival_critical": false,
+  "goal": "Find water and collect 1 sand block from a beach.",
+  "starting_prompt": "Travel to find water. Beaches usually have sand. Collect 1 sand block.",
+  "starting_inventory": {
+    "bread": 5,
+    "wooden_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "sand": 1
+      }
+    }
+  }
+}

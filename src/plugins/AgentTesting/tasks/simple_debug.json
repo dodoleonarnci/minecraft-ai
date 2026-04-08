@@ -1,6 +1,8 @@
 {
   "task_id": "simple_debug",
   "description": "Simple debug task for testing the plugin functionality",
+  "category": "collecting",
+  "survival_critical": false,
 
   "goal": "Wait for 30 seconds and report your inventory",
 

@@ -1,0 +1,28 @@
+{
+  "task_id": "survive_and_collect",
+  "description": "Collect 3 coal at health ≤ 4",
+  "category": "collecting",
+  "survival_critical": true,
+  "goal": "Mine 3 coal at very low health without dying.",
+  "starting_prompt": "You are nearly dead! Mine 3 coal carefully and survive.",
+  "starting_inventory": {
+    "stone_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 240,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "setup_commands": ["/damage @s 16"],
+    "success_criteria": {
+      "required_items": {
+        "coal": 3
+      }
+    }
+  }
+}

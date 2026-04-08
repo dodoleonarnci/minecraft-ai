@@ -1,0 +1,28 @@
+{
+  "task_id": "craft_fencing",
+  "description": "Craft 3 oak fences from planks and sticks",
+  "category": "building",
+  "survival_critical": false,
+  "goal": "Craft 3 oak fences.",
+  "starting_prompt": "You have oak planks and sticks. Craft 3 oak fences.",
+  "starting_inventory": {
+    "oak_planks": 4,
+    "stick": 2
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "oak_fence": 3
+      }
+    }
+  }
+}

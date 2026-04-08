@@ -1,0 +1,27 @@
+{
+  "task_id": "mine_coal",
+  "description": "Mine 3 coal ore blocks from the environment",
+  "category": "collecting",
+  "survival_critical": false,
+  "goal": "Find and mine 3 coal ore blocks. Use your pickaxe to mine coal ore.",
+  "starting_prompt": "You need to mine 3 coal. Look for coal ore blocks and mine them with your pickaxe.",
+  "starting_inventory": {
+    "wooden_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 120,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "coal": 3
+      }
+    }
+  }
+}

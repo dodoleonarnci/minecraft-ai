@@ -1,0 +1,23 @@
+{
+  "task_id": "respond_to_greeting",
+  "description": "Respond to a greeting from the system",
+  "category": "conversing",
+  "survival_critical": false,
+  "goal": "Respond to the greeting in chat.",
+  "starting_prompt": "Hello, what's your name? Please respond.",
+  "starting_inventory": {},
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 60,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "min_actions": 1
+    }
+  }
+}

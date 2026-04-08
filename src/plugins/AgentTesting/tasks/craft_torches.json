@@ -1,0 +1,28 @@
+{
+  "task_id": "craft_torches",
+  "description": "Craft 4 torches from coal and a stick",
+  "category": "building",
+  "survival_critical": false,
+  "goal": "Craft 4 torches.",
+  "starting_prompt": "You have coal and a stick. Craft 4 torches.",
+  "starting_inventory": {
+    "coal": 1,
+    "stick": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "torch": 4
+      }
+    }
+  }
+}

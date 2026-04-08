@@ -1,0 +1,28 @@
+{
+  "task_id": "explore_distance",
+  "description": "Travel far from spawn and collect a dirt block",
+  "category": "traveling",
+  "survival_critical": false,
+  "goal": "Travel far from spawn and collect 1 dirt block.",
+  "starting_prompt": "Travel away from your starting position and collect a dirt block in your new location.",
+  "starting_inventory": {
+    "bread": 5,
+    "wooden_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 200,
+    "y": 64,
+    "z": 200,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "dirt": 1
+      }
+    }
+  }
+}

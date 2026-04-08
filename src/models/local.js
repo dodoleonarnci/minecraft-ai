@@ -31,6 +31,12 @@ export class Local {
                     ...(this.params || {})
                 });
                 if (res) {
+                    // Token usage accumulation for instrumentation (T4.5)
+                    if (res.eval_count != null || res.prompt_eval_count != null) {
+                        this._totalTokens = (this._totalTokens || 0)
+                            + (res.prompt_eval_count || 0)
+                            + (res.eval_count || 0);
+                    }
                     res = res['message']['content'];
                 } else {
                     res = 'No response data.';

@@ -1,0 +1,27 @@
+{
+  "task_id": "craft_planks",
+  "description": "Craft 16 oak planks from oak logs",
+  "category": "crafting",
+  "survival_critical": false,
+  "goal": "Craft 16 oak planks from your oak logs.",
+  "starting_prompt": "You have 4 oak logs in your inventory. Craft them into 16 oak planks.",
+  "starting_inventory": {
+    "oak_log": 4
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 150,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "oak_planks": 16
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "task_id": "mine_iron_ore",
+  "description": "Mine 3 raw iron from iron ore",
+  "category": "collecting",
+  "survival_critical": false,
+  "goal": "Find and mine 3 iron ore blocks to obtain raw iron.",
+  "starting_prompt": "You need to mine 3 raw iron. Find iron ore and use your stone pickaxe to mine it.",
+  "starting_inventory": {
+    "stone_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 120,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "raw_iron": 3
+      }
+    }
+  }
+}

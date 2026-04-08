@@ -1,0 +1,25 @@
+{
+  "task_id": "follow_instruction",
+  "description": "Follow a multi-step instruction: check inventory then chat",
+  "category": "conversing",
+  "survival_critical": false,
+  "goal": "Check your inventory then say what you have.",
+  "starting_prompt": "Please check your inventory using !inventory, then tell me in chat what you have.",
+  "starting_inventory": {
+    "stone": 5
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 60,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "min_actions": 1
+    }
+  }
+}

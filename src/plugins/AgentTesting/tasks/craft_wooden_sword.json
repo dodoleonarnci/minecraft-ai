@@ -1,0 +1,27 @@
+{
+  "task_id": "craft_wooden_sword",
+  "description": "Craft a wooden sword from oak logs",
+  "category": "crafting",
+  "survival_critical": false,
+  "goal": "Craft a wooden sword.",
+  "starting_prompt": "You have 2 oak logs. Make planks and sticks, then craft a wooden sword.",
+  "starting_inventory": {
+    "oak_log": 2
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 150,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "wooden_sword": 1
+      }
+    }
+  }
+}

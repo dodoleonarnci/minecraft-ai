@@ -1,6 +1,8 @@
 {
   "task_id": "mining_stone",
   "description": "Test agent's ability to mine stone and cobblestone",
+  "category": "collecting",
+  "survival_critical": false,
 
   "goal": "Mine 20 cobblestone blocks using your wooden pickaxe",
 

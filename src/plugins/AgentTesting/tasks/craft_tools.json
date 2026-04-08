@@ -1,6 +1,8 @@
 {
   "task_id": "craft_tools",
   "description": "Test agent's ability to craft a complete set of wooden tools",
+  "category": "crafting",
+  "survival_critical": false,
 
   "goal": "Craft a complete set of wooden tools: pickaxe, axe, sword, shovel, and hoe",
 

@@ -1,0 +1,27 @@
+{
+  "task_id": "craft_stone_bricks",
+  "description": "Craft 4 stone bricks from stone",
+  "category": "building",
+  "survival_critical": false,
+  "goal": "Craft 4 stone bricks.",
+  "starting_prompt": "You have 4 stone blocks. Craft them into 4 stone bricks.",
+  "starting_inventory": {
+    "stone": 4
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "stone_bricks": 4
+      }
+    }
+  }
+}

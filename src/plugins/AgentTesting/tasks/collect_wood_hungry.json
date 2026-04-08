@@ -1,0 +1,28 @@
+{
+  "task_id": "collect_wood_hungry",
+  "description": "Collect 4 oak logs while starving (hunger ≤ 5)",
+  "category": "collecting",
+  "survival_critical": true,
+  "goal": "You are very hungry! Collect 4 oak logs. You may need to find food first.",
+  "starting_prompt": "You are starving and need to collect 4 oak logs. Your hunger is very low!",
+  "starting_inventory": {
+    "wooden_axe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "setup_commands": ["/effect give @s minecraft:hunger 300 2"],
+    "success_criteria": {
+      "required_items": {
+        "oak_log": 4
+      }
+    }
+  }
+}

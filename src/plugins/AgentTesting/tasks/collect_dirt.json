@@ -1,0 +1,28 @@
+{
+  "task_id": "collect_dirt",
+  "description": "Collect 16 dirt blocks from the environment",
+  "category": "collecting",
+  "survival_critical": false,
+  "goal": "Collect 16 dirt blocks.",
+  "starting_prompt": "You need to collect 16 dirt blocks. Look around for dirt and gather it.",
+  "starting_inventory": {
+    "wooden_pickaxe": 1,
+    "wooden_axe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 120,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "dirt": 16
+      }
+    }
+  }
+}

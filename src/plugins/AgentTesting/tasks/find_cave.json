@@ -1,0 +1,28 @@
+{
+  "task_id": "find_cave",
+  "description": "Find a cave and mine cobblestone inside",
+  "category": "traveling",
+  "survival_critical": false,
+  "goal": "Find a cave and mine 1 cobblestone block inside.",
+  "starting_prompt": "Find a cave entrance and mine a cobblestone block inside it.",
+  "starting_inventory": {
+    "bread": 5,
+    "wooden_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "cobblestone": 1
+      }
+    }
+  }
+}

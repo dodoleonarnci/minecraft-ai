@@ -1,0 +1,28 @@
+{
+  "task_id": "find_oak_tree",
+  "description": "Navigate to an oak tree and collect a log",
+  "category": "traveling",
+  "survival_critical": false,
+  "goal": "Find an oak tree and collect at least 1 oak log.",
+  "starting_prompt": "Travel to find an oak tree and collect 1 oak log.",
+  "starting_inventory": {
+    "bread": 5,
+    "wooden_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "oak_log": 1
+      }
+    }
+  }
+}

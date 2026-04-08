@@ -1,0 +1,29 @@
+{
+  "task_id": "find_birch_tree",
+  "description": "Navigate to a birch tree and collect a log",
+  "category": "traveling",
+  "survival_critical": false,
+  "goal": "Find a birch tree and collect 1 birch log.",
+  "starting_prompt": "Travel to find a birch tree and collect 1 birch log.",
+  "starting_inventory": {
+    "bread": 5,
+    "wooden_pickaxe": 1,
+    "wooden_axe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "birch_log": 1
+      }
+    }
+  }
+}

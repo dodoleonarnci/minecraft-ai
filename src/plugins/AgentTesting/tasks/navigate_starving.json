@@ -1,0 +1,28 @@
+{
+  "task_id": "navigate_starving",
+  "description": "Navigate to a tree and collect a log at hunger ≤ 3",
+  "category": "traveling",
+  "survival_critical": true,
+  "goal": "Travel to a tree and collect 1 oak log even though you are starving.",
+  "starting_prompt": "You are starving! Travel to find an oak tree and collect 1 oak log.",
+  "starting_inventory": {
+    "wooden_axe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 240,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "setup_commands": ["/effect give @s minecraft:hunger 600 5"],
+    "success_criteria": {
+      "required_items": {
+        "oak_log": 1
+      }
+    }
+  }
+}

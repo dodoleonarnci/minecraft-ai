@@ -15,6 +15,22 @@ export class PluginInstance {
         this.monitoringInterval = null;
         this.availableTasks = new Map();
         this.resultsDir = `bots/${agent.name}/test_results`;
+
+        // Batch mode state (T4.7)
+        this.batchQueue = null;
+        this.batchResults = [];
+        this.batchStartTime = null;
+        this.batchFilter = 'all';
+
+        // Telemetry state (T4.6)
+        this._telemetryTimeline = [];
+        this._telemetryListener = null;
+        this._telemetryStartTime = null;
+        this._telemetryInterval = null;
+
+        // Death listener state (T4.5)
+        this._agentDied = false;
+        this._deathHandler = null;
     }
 
     init() {
@@ -37,6 +53,13 @@ export class PluginInstance {
             this.agent.bot.once('spawn', async () => {
                 // Wait a bit for the world to load
                 await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Batch mode auto-start (T4.7) takes precedence over single-task auto-start
+                if (profileTestConfig.batch && profileTestConfig.auto_start) {
+                    console.log('[AgentTesting] Auto-starting batch test...');
+                    await this.runBatch(profileTestConfig.batch_filter || 'all');
+                    return;
+                }
 
                 if (profileTestConfig.task_file) {
                     console.log(`[AgentTesting] Auto-loading task from ${profileTestConfig.task_file}`);
@@ -66,6 +89,9 @@ export class PluginInstance {
     loadAvailableTasks() {
         const tasksDir = 'src/plugins/AgentTesting/tasks';
 
+        // Cache of full task data by id, used for category filtering in batch mode
+        this.taskDataCache = new Map();
+
         try {
             if (!existsSync(tasksDir)) {
                 console.log('[AgentTesting] Tasks directory does not exist, creating it...');
@@ -81,6 +107,7 @@ export class PluginInstance {
                         const taskData = JSON.parse(readFileSync(taskPath, 'utf8'));
                         if (taskData.task_id) {
                             this.availableTasks.set(taskData.task_id, taskPath);
+                            this.taskDataCache.set(taskData.task_id, taskData);
                             console.log(`[AgentTesting] Loaded task: ${taskData.task_id}`);
                         }
                     } catch (err) {
@@ -187,6 +214,18 @@ export class PluginInstance {
                 }
             }
 
+            // Run any extra setup commands (T4.1: survival-critical task support).
+            // These run after teleport + inventory so effects/damage land on the
+            // already-positioned, already-stocked agent.
+            if (config.setup_commands && Array.isArray(config.setup_commands)) {
+                console.log(`[AgentTesting] Running ${config.setup_commands.length} setup command(s)...`);
+                for (const cmd of config.setup_commands) {
+                    console.log(`[AgentTesting] Setup command: ${cmd}`);
+                    bot.chat(cmd);
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+
             console.log('[AgentTesting] Environment setup complete');
             return true;
         } catch (err) {
@@ -210,9 +249,34 @@ export class PluginInstance {
 
         this.testActive = true;
         this.testStartTime = Date.now();
+
+        // --- T4.5: reset all instrumentation counters on the shared objects ---
+        this.agent._actionCount = 0;
+        this.agent._hallucinationCount = 0;
+        this.agent._outOfSetCount = 0;
+        if (this.agent.prompter && this.agent.prompter.chat_model) {
+            this.agent.prompter.chat_model._totalTokens = 0;
+        }
+        // Clear stale enhancer state from any previous test
+        if (this.agent.prompter && this.agent.prompter.enhancer) {
+            this.agent.prompter.enhancer._lastCategory = null;
+        }
+
+        // --- T4.5: death listener owned by the plugin ---
+        this._agentDied = false;
+        this._deathHandler = () => { this._agentDied = true; };
+        this.agent.bot.on('death', this._deathHandler);
+
+        // --- T4.6: telemetry timeline ---
+        this._telemetryTimeline = [];
+        this._telemetryStartTime = Date.now();
+        this._startTelemetry();
+
         this.testResults = {
             task_id: this.currentTask.task_id,
             agent_name: this.agent.name,
+            category: this.currentTask.category || 'unknown',
+            survival_critical: this.currentTask.survival_critical || false,
             start_time: new Date(this.testStartTime).toISOString(),
             end_time: null,
             duration_seconds: null,
@@ -221,6 +285,12 @@ export class PluginInstance {
             initial_inventory: this.currentTask.starting_inventory || {},
             final_inventory: {},
             actions_taken: 0,
+            hallucination_count: 0,
+            agent_died: false,
+            token_count: 0,
+            detected_category: null,
+            out_of_set_commands: 0,
+            telemetry_timeline: [],
             goal: this.currentTask.goal
         };
 
@@ -292,12 +362,16 @@ export class PluginInstance {
                 }
             }
 
-            // All required items are present
             return true;
         }
 
-        // Add more success criteria checks here as needed
-        // e.g., position checks, entity checks, etc.
+        // Conversing-style criteria (T4.1): verify the agent has executed at least
+        // one action (any command) since startTest() reset the counter. Used for
+        // chat-based tasks where the goal is "respond / report" rather than
+        // collecting an item.
+        if (criteria.min_actions != null) {
+            return (this.agent._actionCount || 0) >= criteria.min_actions;
+        }
 
         return false;
     }
@@ -323,6 +397,17 @@ export class PluginInstance {
             this.monitoringInterval = null;
         }
 
+        // Stop telemetry collection (T4.6)
+        this._stopTelemetry();
+
+        // Detach death listener (T4.5)
+        if (this._deathHandler) {
+            try {
+                this.agent.bot.removeListener('death', this._deathHandler);
+            } catch (err) { /* ignore */ }
+            this._deathHandler = null;
+        }
+
         // Collect final results
         this.testResults.end_time = new Date(this.testEndTime).toISOString();
         this.testResults.duration_seconds = (this.testEndTime - this.testStartTime) / 1000;
@@ -334,6 +419,15 @@ export class PluginInstance {
             y: this.agent.bot.entity.position.y,
             z: this.agent.bot.entity.position.z
         };
+
+        // T4.5: collect instrumentation data from shared state
+        this.testResults.actions_taken = this.agent._actionCount || 0;
+        this.testResults.hallucination_count = this.agent._hallucinationCount || 0;
+        this.testResults.out_of_set_commands = this.agent._outOfSetCount || 0;
+        this.testResults.agent_died = this._agentDied || false;
+        this.testResults.token_count = this.agent.prompter?.chat_model?._totalTokens || 0;
+        this.testResults.detected_category = this.agent.prompter?.enhancer?._lastCategory || null;
+        this.testResults.telemetry_timeline = this._telemetryTimeline.slice();
 
         // Save results to file
         this.saveResults();
@@ -349,7 +443,174 @@ export class PluginInstance {
 
         console.log('[AgentTesting] Test ended. Results saved.');
 
+        // Batch mode chaining (T4.7): if a batch is in progress, queue the next task
+        if (this.batchQueue) {
+            // Push a deep-copy snapshot so subsequent tests don't mutate it
+            this.batchResults.push(JSON.parse(JSON.stringify(this.testResults)));
+            // Brief pause for cleanup before launching the next task
+            setTimeout(() => this._runNextInBatch(), 3000);
+        }
+
         return this.testResults;
+    }
+
+    // ----- Telemetry helpers (T4.6) -----
+
+    _startTelemetry() {
+        const bot = this.agent.bot;
+        if (!bot) return;
+
+        const recordSample = (eventTag) => {
+            try {
+                const pos = bot.entity?.position;
+                let distanceToGoal = null;
+                if (pos && this.currentTask?.teleport_coordinates) {
+                    const goal = this.currentTask.goal_coordinates || this.currentTask.teleport_coordinates;
+                    const dx = pos.x - goal.x;
+                    const dy = pos.y - goal.y;
+                    const dz = pos.z - goal.z;
+                    distanceToGoal = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                }
+                this._telemetryTimeline.push({
+                    timestep: (Date.now() - this._telemetryStartTime) / 1000,
+                    event: eventTag,
+                    health: bot.health ?? null,
+                    food: bot.food ?? null,
+                    oxygen: bot.oxygenLevel ?? null,
+                    position: pos ? { x: pos.x, y: pos.y, z: pos.z } : null,
+                    distance_to_goal: distanceToGoal
+                });
+            } catch (err) {
+                // swallow telemetry errors so they never break a test
+            }
+        };
+
+        // Health-change event listener (mineflayer supports multiple listeners on the same event)
+        this._telemetryListener = () => recordSample('health_change');
+        bot.on('health', this._telemetryListener);
+
+        // Periodic 1-second sampler ensures we capture data even when no health change occurs
+        this._telemetryInterval = setInterval(() => recordSample('tick'), 1000);
+
+        // Initial sample at t=0
+        recordSample('start');
+    }
+
+    _stopTelemetry() {
+        if (this._telemetryListener && this.agent.bot) {
+            try {
+                this.agent.bot.removeListener('health', this._telemetryListener);
+            } catch (err) { /* ignore */ }
+            this._telemetryListener = null;
+        }
+        if (this._telemetryInterval) {
+            clearInterval(this._telemetryInterval);
+            this._telemetryInterval = null;
+        }
+    }
+
+    // ----- Batch mode (T4.7) -----
+
+    async runBatch(filter = 'all') {
+        // Build queue from availableTasks, optionally filtered by category
+        const taskIds = Array.from(this.availableTasks.keys()).filter(id => {
+            if (filter === 'all') return true;
+            const task = this.taskDataCache.get(id);
+            return task && task.category === filter;
+        });
+
+        if (taskIds.length === 0) {
+            console.log('[AgentTesting] No tasks match filter:', filter);
+            return;
+        }
+
+        this.batchQueue = [...taskIds];
+        this.batchResults = [];
+        this.batchStartTime = Date.now();
+        this.batchFilter = filter;
+
+        console.log(`[AgentTesting] Starting batch: ${taskIds.length} tasks (filter: ${filter})`);
+        try { this.agent.bot.chat(`Starting batch test: ${taskIds.length} tasks`); } catch (e) {}
+        await this._runNextInBatch();
+    }
+
+    async _runNextInBatch() {
+        if (!this.batchQueue || this.batchQueue.length === 0) {
+            this._saveBatchResults();
+            return;
+        }
+
+        const taskId = this.batchQueue.shift();
+        const completed = this.batchResults.length;
+        const remaining = this.batchQueue.length;
+        console.log(`[AgentTesting] Batch: starting task ${taskId} (${completed + 1}/${completed + remaining + 1})`);
+
+        // Same sequence as !quickTest: load -> setup -> start
+        const loaded = await this.loadTaskById(taskId);
+        if (!loaded) {
+            console.error(`[AgentTesting] Batch: failed to load ${taskId}, skipping`);
+            this.batchResults.push({ task_id: taskId, success: false, termination_reason: 'load_failed' });
+            setTimeout(() => this._runNextInBatch(), 1000);
+            return;
+        }
+
+        const setup = await this.setupEnvironment();
+        if (!setup) {
+            this.batchResults.push({ task_id: taskId, success: false, termination_reason: 'setup_failed' });
+            setTimeout(() => this._runNextInBatch(), 1000);
+            return;
+        }
+
+        await this.startTest();
+        // startTest returns immediately; endTest will be triggered by either
+        // the success-criteria monitor or the timeout, then chain via batchQueue.
+    }
+
+    _saveBatchResults() {
+        try {
+            const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '-');
+            const filename = `batch_${this.agent.name}_${timestamp}.json`;
+            const filepath = join(this.resultsDir, filename);
+
+            const successCount = this.batchResults.filter(r => r.success).length;
+            const totalCount = this.batchResults.length;
+
+            const batchReport = {
+                experiment: this.agent.name,
+                timestamp: new Date().toISOString(),
+                config: {
+                    profile_name: this.agent.prompter?.profile?.name || this.agent.name,
+                    enhancer: this.agent.prompter?.enhancer?.constructor?.name || 'Enhancer',
+                    enhancer_config: this.agent.prompter?.profile?.enhancer || null,
+                    model: this.agent.prompter?.profile?.model || null,
+                    filter: this.batchFilter,
+                    total_tasks: totalCount
+                },
+                total_duration_seconds: (Date.now() - this.batchStartTime) / 1000,
+                summary: {
+                    success_count: successCount,
+                    failure_count: totalCount - successCount,
+                    success_rate: totalCount > 0 ? successCount / totalCount : 0,
+                    mean_actions: totalCount > 0 ? this.batchResults.reduce((s, r) => s + (r.actions_taken || 0), 0) / totalCount : 0,
+                    mean_hallucinations: totalCount > 0 ? this.batchResults.reduce((s, r) => s + (r.hallucination_count || 0), 0) / totalCount : 0,
+                    mean_tokens: totalCount > 0 ? this.batchResults.reduce((s, r) => s + (r.token_count || 0), 0) / totalCount : 0
+                },
+                results: this.batchResults
+            };
+
+            writeFileSync(filepath, JSON.stringify(batchReport, null, 2));
+            console.log(`[AgentTesting] Batch complete. ${successCount}/${totalCount} passed. Saved to: ${filepath}`);
+
+            // Also save as latest_batch.json for the orchestration script
+            const latestPath = join(this.resultsDir, 'latest_batch.json');
+            writeFileSync(latestPath, JSON.stringify(batchReport, null, 2));
+
+            try { this.agent.bot.chat(`Batch complete: ${successCount}/${totalCount} passed`); } catch (e) {}
+        } catch (err) {
+            console.error('[AgentTesting] Error saving batch results:', err.message);
+        } finally {
+            this.batchQueue = null;
+        }
     }
 
     saveResults() {
@@ -489,6 +750,20 @@ export class PluginInstance {
                     console.log(list);
                     agent.bot.chat(`Check console for task list`);
                     return list;
+                }
+            },
+            {
+                name: '!batchTest',
+                description: 'Run all tasks (or tasks of a given category) sequentially and save aggregate results.',
+                params: {
+                    'filter': {
+                        type: 'string',
+                        description: '"all" or a category name (building, crafting, collecting, traveling, hunting, conversing)'
+                    }
+                },
+                perform: async (agent, filter) => {
+                    const plugin = agent.plugin.plugins["AgentTesting"];
+                    await plugin.runBatch(filter || 'all');
                 }
             },
             {

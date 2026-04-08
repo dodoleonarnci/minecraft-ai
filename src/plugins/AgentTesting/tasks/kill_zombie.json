@@ -1,0 +1,28 @@
+{
+  "task_id": "kill_zombie",
+  "description": "Kill a zombie and obtain rotten flesh",
+  "category": "hunting",
+  "survival_critical": false,
+  "goal": "Kill a zombie and obtain at least 1 rotten flesh.",
+  "starting_prompt": "Find a zombie and kill it for rotten flesh. Be careful!",
+  "starting_inventory": {
+    "stone_sword": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 150,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "setup_commands": ["/summon minecraft:zombie ~ ~ ~5"],
+    "success_criteria": {
+      "required_items": {
+        "rotten_flesh": 1
+      }
+    }
+  }
+}

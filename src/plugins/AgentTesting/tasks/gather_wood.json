@@ -1,6 +1,8 @@
 {
   "task_id": "gather_wood",
   "description": "Test agent's ability to gather wood and craft planks",
+  "category": "collecting",
+  "survival_critical": false,
 
   "goal": "Gather 10 oak logs and craft them into 40 oak planks",
 

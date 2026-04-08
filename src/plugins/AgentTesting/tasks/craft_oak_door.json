@@ -1,0 +1,27 @@
+{
+  "task_id": "craft_oak_door",
+  "description": "Craft an oak door from oak planks",
+  "category": "building",
+  "survival_critical": false,
+  "goal": "Craft an oak door.",
+  "starting_prompt": "You have 6 oak planks. Craft an oak door.",
+  "starting_inventory": {
+    "oak_planks": 6
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 180,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "oak_door": 1
+      }
+    }
+  }
+}

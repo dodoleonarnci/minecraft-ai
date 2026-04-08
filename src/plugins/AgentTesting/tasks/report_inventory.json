@@ -1,0 +1,26 @@
+{
+  "task_id": "report_inventory",
+  "description": "Report inventory contents when asked",
+  "category": "conversing",
+  "survival_critical": false,
+  "goal": "Use the !inventory command to report your inventory.",
+  "starting_prompt": "Please check your inventory and report what you have. Use the !inventory command.",
+  "starting_inventory": {
+    "diamond": 1,
+    "emerald": 2
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 60,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "min_actions": 1
+    }
+  }
+}

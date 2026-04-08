@@ -286,7 +286,15 @@ export class Agent {
                 if (!commandExists(command_name)) {
                     this.history.add('system', `Command ${command_name} does not exist.`);
                     console.warn('Agent hallucinated command:', command_name)
+                    this._hallucinationCount = (this._hallucinationCount || 0) + 1;
                     continue;
+                }
+
+                // Out-of-set tracking (T4.5): if SoftClusteringEnhancer is active, check
+                // whether the chosen command was inside the filtered Top-K list.
+                const topK = this.prompter?.enhancer?._lastTopKNames;
+                if (topK && !topK.includes(command_name)) {
+                    this._outOfSetCount = (this._outOfSetCount || 0) + 1;
                 }
 
                 if (checkInterrupt()) break;
@@ -307,6 +315,7 @@ export class Agent {
 
                 console.log('Agent executed:', command_name, 'and got:', execute_res);
                 used_command = true;
+                this._actionCount = (this._actionCount || 0) + 1;
 
                 if (execute_res)
                     this.history.add('system', execute_res);
