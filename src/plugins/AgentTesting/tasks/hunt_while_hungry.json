@@ -20,7 +20,12 @@
     "timeout_seconds": 240,
     "enable_cheat_mode": true,
     "reset_inventory": true,
-    "setup_commands": ["/effect give @s minecraft:hunger 300 2"],
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/summon minecraft:cow ~5 ~ ~5",
+      "/effect give @s minecraft:hunger 300 2"
+    ],
     "success_criteria": {
       "required_items": {
         "cooked_beef": 1

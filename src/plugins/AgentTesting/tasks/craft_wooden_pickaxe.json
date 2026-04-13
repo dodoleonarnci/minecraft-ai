@@ -22,6 +22,10 @@
       "required_items": {
         "wooden_pickaxe": 1
       }
-    }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear"
+    ]
   }
 }

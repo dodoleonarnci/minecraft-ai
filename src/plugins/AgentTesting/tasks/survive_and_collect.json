@@ -1,6 +1,6 @@
 {
   "task_id": "survive_and_collect",
-  "description": "Collect 3 coal at health ≤ 4",
+  "description": "Collect 3 coal at health \u2264 4",
   "category": "collecting",
   "survival_critical": true,
   "goal": "Mine 3 coal at very low health without dying.",
@@ -18,7 +18,11 @@
     "timeout_seconds": 240,
     "enable_cheat_mode": true,
     "reset_inventory": true,
-    "setup_commands": ["/damage @s 16"],
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/damage @s 16"
+    ],
     "success_criteria": {
       "required_items": {
         "coal": 3

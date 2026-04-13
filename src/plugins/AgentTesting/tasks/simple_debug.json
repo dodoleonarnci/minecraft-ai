@@ -3,24 +3,19 @@
   "description": "Simple debug task for testing the plugin functionality",
   "category": "collecting",
   "survival_critical": false,
-
   "goal": "Wait for 30 seconds and report your inventory",
-
   "starting_prompt": "This is a simple debug task. Wait for about 30 seconds, then check your inventory and report what items you have. You should have a diamond in your inventory.",
-
   "starting_inventory": {
     "diamond": 1,
     "emerald": 1,
     "gold_ingot": 5
   },
-
   "teleport_coordinates": {
     "x": 0,
     "y": 100,
     "z": 0,
     "dimension": "overworld"
   },
-
   "test_config": {
     "timeout_seconds": 60,
     "enable_cheat_mode": true,
@@ -29,6 +24,10 @@
       "required_items": {
         "diamond": 1
       }
-    }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear"
+    ]
   }
 }

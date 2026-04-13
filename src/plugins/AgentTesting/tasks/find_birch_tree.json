@@ -24,6 +24,10 @@
       "required_items": {
         "birch_log": 1
       }
-    }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear"
+    ]
   }
 }

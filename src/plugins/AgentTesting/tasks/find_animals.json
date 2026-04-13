@@ -23,6 +23,11 @@
       "required_items": {
         "leather": 1
       }
-    }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/summon minecraft:cow ~80 ~ ~80"
+    ]
   }
 }

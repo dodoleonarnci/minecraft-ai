@@ -22,6 +22,11 @@
       "required_items": {
         "mutton": 1
       }
-    }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/summon minecraft:sheep ~5 ~ ~5"
+    ]
   }
 }

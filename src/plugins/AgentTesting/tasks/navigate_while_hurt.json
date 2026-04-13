@@ -19,7 +19,11 @@
     "timeout_seconds": 180,
     "enable_cheat_mode": true,
     "reset_inventory": true,
-    "setup_commands": ["/damage @s 15"],
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/damage @s 15"
+    ],
     "success_criteria": {
       "required_items": {
         "oak_log": 1

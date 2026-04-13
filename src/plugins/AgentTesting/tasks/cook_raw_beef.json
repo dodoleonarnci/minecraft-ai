@@ -24,6 +24,11 @@
       "required_items": {
         "cooked_beef": 1
       }
-    }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/summon minecraft:cow ~5 ~ ~5"
+    ]
   }
 }

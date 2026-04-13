@@ -1,6 +1,6 @@
 {
   "task_id": "craft_pickaxe_starving",
-  "description": "Craft a stone pickaxe at hunger ≤ 2",
+  "description": "Craft a stone pickaxe at hunger \u2264 2",
   "category": "crafting",
   "survival_critical": true,
   "goal": "Craft a stone pickaxe even though you are starving.",
@@ -19,7 +19,11 @@
     "timeout_seconds": 180,
     "enable_cheat_mode": true,
     "reset_inventory": true,
-    "setup_commands": ["/effect give @s minecraft:hunger 600 5"],
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/effect give @s minecraft:hunger 600 5"
+    ],
     "success_criteria": {
       "required_items": {
         "stone_pickaxe": 1

@@ -1,6 +1,6 @@
 {
   "task_id": "craft_while_starving",
-  "description": "Craft a wooden axe while starving (hunger ≤ 5)",
+  "description": "Craft a wooden axe while starving (hunger \u2264 5)",
   "category": "crafting",
   "survival_critical": true,
   "goal": "Craft a wooden axe even though you are starving.",
@@ -18,7 +18,11 @@
     "timeout_seconds": 180,
     "enable_cheat_mode": true,
     "reset_inventory": true,
-    "setup_commands": ["/effect give @s minecraft:hunger 300 2"],
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/effect give @s minecraft:hunger 300 2"
+    ],
     "success_criteria": {
       "required_items": {
         "wooden_axe": 1

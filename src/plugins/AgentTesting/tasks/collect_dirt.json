@@ -23,6 +23,10 @@
       "required_items": {
         "dirt": 16
       }
-    }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear"
+    ]
   }
 }

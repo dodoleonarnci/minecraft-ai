@@ -22,6 +22,10 @@
       "required_items": {
         "raw_copper": 4
       }
-    }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear"
+    ]
   }
 }

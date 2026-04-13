@@ -24,6 +24,10 @@
       "required_items": {
         "glass_pane": 16
       }
-    }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear"
+    ]
   }
 }

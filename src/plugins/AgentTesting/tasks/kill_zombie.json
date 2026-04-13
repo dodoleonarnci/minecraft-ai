@@ -18,7 +18,11 @@
     "timeout_seconds": 150,
     "enable_cheat_mode": true,
     "reset_inventory": true,
-    "setup_commands": ["/summon minecraft:zombie ~ ~ ~5"],
+    "setup_commands": [
+      "/time set 18000",
+      "/weather clear",
+      "/summon minecraft:zombie ~ ~ ~5"
+    ],
     "success_criteria": {
       "required_items": {
         "rotten_flesh": 1
