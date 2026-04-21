@@ -1,0 +1,4 @@
+{
+  "_comment": "Set surface_y to the actual ground level Y in your world at the teleport coordinates used by tasks. All task teleport Y values will be replaced with this. Run '/tp @s 0 ~ 0' in-game then look at your Y coordinate to find the surface level.",
+  "surface_y": 65
+}

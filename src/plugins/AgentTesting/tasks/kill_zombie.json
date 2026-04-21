@@ -27,6 +27,9 @@
       "required_items": {
         "rotten_flesh": 1
       }
-    }
+    },
+    "disabled_modes": [
+      "self_preservation"
+    ]
   }
 }

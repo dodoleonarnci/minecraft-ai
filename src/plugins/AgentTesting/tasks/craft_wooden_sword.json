@@ -4,9 +4,9 @@
   "category": "crafting",
   "survival_critical": false,
   "goal": "Craft a wooden sword.",
-  "starting_prompt": "You have 2 oak logs. Make planks and sticks, then craft a wooden sword.",
+  "starting_prompt": "You have 3 oak logs. Make planks and sticks, craft a crafting table, then craft a wooden sword.",
   "starting_inventory": {
-    "oak_log": 2
+    "oak_log": 3
   },
   "teleport_coordinates": {
     "x": 0,

@@ -1,0 +1,35 @@
+{
+  "task_id": "consume_food_starving",
+  "description": "Eat bread to recover from critical hunger. Tests !consume surfacing in hunting Top-K (survival override path) vs hallucinated !eat/!feed.",
+  "category": "hunting",
+  "survival_critical": true,
+  "goal": "Eat bread to restore your hunger.",
+  "starting_prompt": "You are starving and have 5 bread in your inventory. Eat at least 3 pieces of bread to restore your hunger. You must consume the bread — not drop or discard it.",
+  "starting_inventory": {
+    "bread": 5
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 90,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "max_items": {
+        "bread": 2
+      },
+      "required_items": {
+        "bread": 1
+      }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/effect give @s minecraft:hunger 300 10"
+    ]
+  }
+}

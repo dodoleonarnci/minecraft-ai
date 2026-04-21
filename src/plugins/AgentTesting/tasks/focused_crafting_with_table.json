@@ -1,0 +1,33 @@
+{
+  "task_id": "focused_crafting_with_table",
+  "description": "Craft an iron pickaxe using provided materials. Tests !craftRecipe vs the commonly hallucinated !craftItem (which appears in few-shot examples).",
+  "category": "crafting",
+  "survival_critical": false,
+  "goal": "Craft an iron_pickaxe.",
+  "starting_prompt": "You have a crafting table, 3 iron ingots, and 2 sticks. Place the crafting table and craft an iron pickaxe using the correct recipe.",
+  "starting_inventory": {
+    "crafting_table": 1,
+    "iron_ingot": 3,
+    "stick": 2
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 120,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "iron_pickaxe": 1
+      }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear"
+    ]
+  }
+}

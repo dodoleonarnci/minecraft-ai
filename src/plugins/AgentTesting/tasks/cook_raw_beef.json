@@ -29,6 +29,9 @@
       "/time set 1000",
       "/weather clear",
       "/summon minecraft:cow ~5 ~ ~5"
+    ],
+    "disabled_modes": [
+      "self_preservation"
     ]
   }
 }

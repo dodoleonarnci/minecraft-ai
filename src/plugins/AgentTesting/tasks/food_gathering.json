@@ -32,6 +32,9 @@
       "/summon minecraft:pig ~-5 ~ ~10",
       "/summon minecraft:sheep ~10 ~ ~-5",
       "/summon minecraft:chicken ~-5 ~ ~-10"
+    ],
+    "disabled_modes": [
+      "self_preservation"
     ]
   }
 }

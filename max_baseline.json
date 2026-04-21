@@ -10,13 +10,6 @@
         "api" : "openai",
         "model": "gpt-4.1-nano"
     },
-    "enhancer": {
-        "name": "soft-clustering",
-        "topK": 10,
-        "relevanceWeight": 0.7,
-        "semanticWeight": 0.3, 
-        "customMatrixPath": "./default_relevance_matrix.json"
-    },
     "viewer" : false,
     "embedding": {
         "api": "openai",

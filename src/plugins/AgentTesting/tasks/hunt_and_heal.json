@@ -30,6 +30,9 @@
       "required_items": {
         "cooked_porkchop": 1
       }
-    }
+    },
+    "disabled_modes": [
+      "self_preservation"
+    ]
   }
 }

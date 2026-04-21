@@ -1,0 +1,35 @@
+{
+  "task_id": "mine_with_correct_tool",
+  "description": "Equip a stone pickaxe before mining iron ore (wooden pickaxe cannot break iron ore). Tests !equip surfacing alongside !collectBlocks in collecting Top-K.",
+  "category": "collecting",
+  "survival_critical": false,
+  "goal": "Mine 1 raw_iron by equipping the stone pickaxe.",
+  "starting_prompt": "There is iron ore nearby. You have a wooden pickaxe and a stone pickaxe in your inventory. A wooden pickaxe CANNOT mine iron ore — you must equip the stone pickaxe first, then mine the iron ore to collect raw iron.",
+  "starting_inventory": {
+    "wooden_pickaxe": 1,
+    "stone_pickaxe": 1
+  },
+  "teleport_coordinates": {
+    "x": 0,
+    "y": 64,
+    "z": 0,
+    "dimension": "overworld"
+  },
+  "test_config": {
+    "timeout_seconds": 150,
+    "enable_cheat_mode": true,
+    "reset_inventory": true,
+    "success_criteria": {
+      "required_items": {
+        "raw_iron": 1
+      }
+    },
+    "setup_commands": [
+      "/time set 1000",
+      "/weather clear",
+      "/setblock ~2 ~ ~2 minecraft:iron_ore",
+      "/setblock ~3 ~ ~2 minecraft:iron_ore",
+      "/setblock ~2 ~ ~3 minecraft:iron_ore"
+    ]
+  }
+}

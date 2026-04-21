@@ -3,6 +3,20 @@ import { join, resolve } from 'path';
 import { executeCommand } from '../../agent/commands/index.js';
 import * as world from '../../agent/library/world.js';
 
+// Load world config once at module level — user sets surface_y for their world
+const WORLD_CONFIG_PATH = 'src/plugins/AgentTesting/world_config.json';
+let _worldConfig = null;
+function getWorldConfig() {
+    if (!_worldConfig) {
+        try {
+            _worldConfig = JSON.parse(readFileSync(WORLD_CONFIG_PATH, 'utf8'));
+        } catch (err) {
+            _worldConfig = {};
+        }
+    }
+    return _worldConfig;
+}
+
 export class PluginInstance {
     constructor(agent) {
         this.agent = agent;
@@ -186,6 +200,35 @@ export class PluginInstance {
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
+            // Disable any modes listed in the task's disabled_modes array.
+            // Snapshot the current state so endTest() can restore them.
+            this._disabledModes = [];
+            if (config.disabled_modes && Array.isArray(config.disabled_modes)) {
+                for (const modeName of config.disabled_modes) {
+                    try {
+                        const wasOn = bot.modes.isOn(modeName);
+                        bot.modes.setOn(modeName, false);
+                        this._disabledModes.push({ name: modeName, wasOn });
+                        console.log(`[AgentTesting] Disabled mode: ${modeName}`);
+                    } catch (e) {
+                        console.warn(`[AgentTesting] Unknown mode "${modeName}", skipping`);
+                    }
+                }
+            }
+
+            // Always restore full health and hunger before each task.
+            // This gives every task a clean physiological baseline.
+            // Survival-critical tasks re-apply damage/hunger via setup_commands after this.
+            console.log('[AgentTesting] Restoring full health and hunger...');
+            bot.chat('/effect clear @s');
+            await new Promise(resolve => setTimeout(resolve, 200));
+            // Instant Health amplifier 4 = ~32 HP restored (more than the 20 HP max)
+            bot.chat('/effect give @s minecraft:instant_health 1 4');
+            await new Promise(resolve => setTimeout(resolve, 200));
+            // Saturation fills the hunger bar; amplifier 255 for 5 seconds saturates fully
+            bot.chat('/effect give @s minecraft:saturation 5 255');
+            await new Promise(resolve => setTimeout(resolve, 500));
+
             // Clear inventory if configured
             if (config.reset_inventory) {
                 console.log('[AgentTesting] Clearing inventory...');
@@ -196,10 +239,12 @@ export class PluginInstance {
             // Teleport to starting coordinates if specified
             if (this.currentTask.teleport_coordinates) {
                 const coords = this.currentTask.teleport_coordinates;
-                console.log(`[AgentTesting] Teleporting to coordinates: ${coords.x}, ${coords.y}, ${coords.z}`);
-
-                // Use cheat mode teleport or minecraft command
-                bot.chat(`/tp @s ${coords.x} ${coords.y} ${coords.z}`);
+                // Use world_config.json surface_y if set, otherwise fall back to task y
+                const cfg = getWorldConfig();
+                const y = (cfg.surface_y != null) ? cfg.surface_y : coords.y;
+                console.log(`[AgentTesting] Teleporting to: ${coords.x}, ${y}, ${coords.z}` +
+                    (cfg.surface_y != null ? ` (y overridden by world_config.json)` : ''));
+                bot.chat(`/tp @s ${coords.x} ${y} ${coords.z}`);
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
 
@@ -246,6 +291,13 @@ export class PluginInstance {
         }
 
         console.log(`[AgentTesting] Starting test: ${this.currentTask.task_id}`);
+
+        // Reset conversation history + memory so each task starts from a clean
+        // slate (no leftover turns, summary, or memory bank entries from prior tests).
+        if (this.agent.history && typeof this.agent.history.clear === 'function') {
+            console.log('[AgentTesting] Clearing agent history and memory...');
+            this.agent.history.clear();
+        }
 
         this.testActive = true;
         this.testStartTime = Date.now();
@@ -351,14 +403,27 @@ export class PluginInstance {
             return false;
         }
 
-        // Check required items in inventory
-        if (criteria.required_items) {
+        // Check required items in inventory (min count, inclusive)
+        // and/or max_items (ceiling count, inclusive). Both can be combined;
+        // the task succeeds only if every listed item passes its check.
+        if (criteria.required_items || criteria.max_items) {
             const inventory = world.getInventoryCounts(this.agent.bot);
 
-            for (const [itemName, requiredCount] of Object.entries(criteria.required_items)) {
-                const actualCount = inventory[itemName] || 0;
-                if (actualCount < requiredCount) {
-                    return false;
+            if (criteria.required_items) {
+                for (const [itemName, requiredCount] of Object.entries(criteria.required_items)) {
+                    const actualCount = inventory[itemName] || 0;
+                    if (actualCount < requiredCount) {
+                        return false;
+                    }
+                }
+            }
+
+            if (criteria.max_items) {
+                for (const [itemName, maxCount] of Object.entries(criteria.max_items)) {
+                    const actualCount = inventory[itemName] || 0;
+                    if (actualCount > maxCount) {
+                        return false;
+                    }
                 }
             }
 
@@ -400,6 +465,17 @@ export class PluginInstance {
         // Stop telemetry collection (T4.6)
         this._stopTelemetry();
 
+        // Restore any modes that were disabled for this task
+        if (this._disabledModes && this._disabledModes.length > 0) {
+            for (const { name, wasOn } of this._disabledModes) {
+                try {
+                    this.agent.bot.modes.setOn(name, wasOn);
+                    console.log(`[AgentTesting] Restored mode: ${name} -> ${wasOn}`);
+                } catch (e) { /* ignore */ }
+            }
+            this._disabledModes = [];
+        }
+
         // Detach death listener (T4.5)
         if (this._deathHandler) {
             try {
@@ -440,6 +516,13 @@ export class PluginInstance {
 
         this.agent.history.add('system', message);
         this.agent.history.save();
+
+        // Broadcast result to in-game chat so it's visible without reading logs
+        const duration = this.testResults.duration_seconds?.toFixed(1) ?? '?';
+        const chatMsg = success
+            ? `[AgentTesting] PASS: ${this.testResults.task_id} (${duration}s, ${this.testResults.actions_taken} actions)`
+            : `[AgentTesting] FAIL: ${this.testResults.task_id} — ${reason} (${duration}s)`;
+        try { this.agent.bot.chat(chatMsg); } catch (e) {}
 
         console.log('[AgentTesting] Test ended. Results saved.');
 
