@@ -63,8 +63,7 @@ export class PluginInstance {
         if (profileTestConfig) {
             console.log('[AgentTesting] Found test configuration in agent profile');
 
-            // Set up spawn event handler for automatic test initialization
-            this.agent.bot.once('spawn', async () => {
+            const onReady = async () => {
                 // Wait a bit for the world to load
                 await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -94,7 +93,18 @@ export class PluginInstance {
                         await this.startTest();
                     }
                 }
-            });
+            };
+
+            // plugin.init() runs from inside the agent's spawn handler (agent.js:446),
+            // so the 'spawn' event has already fired by the time we get here — a
+            // new once('spawn', ...) listener would never be called. Detect the
+            // already-spawned case via bot.entity and fire onReady directly.
+            if (this.agent.bot.entity) {
+                console.log('[AgentTesting] Bot already spawned, starting auto-run now');
+                onReady().catch(err => console.error('[AgentTesting] Auto-start failed:', err));
+            } else {
+                this.agent.bot.once('spawn', onReady);
+            }
         }
 
         console.log('[AgentTesting] Plugin initialized successfully');
@@ -196,8 +206,7 @@ export class PluginInstance {
             if (config.enable_cheat_mode) {
                 console.log('[AgentTesting] Enabling cheat mode...');
                 bot.modes.setOn('cheat', true);
-                // Give operator permissions if needed
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 300));
             }
 
             // Disable any modes listed in the task's disabled_modes array.
@@ -219,13 +228,13 @@ export class PluginInstance {
             // Always restore full health and hunger before each task.
             // This gives every task a clean physiological baseline.
             // Survival-critical tasks re-apply damage/hunger via setup_commands after this.
+            // NOTE: Delays between bot.chat() calls must be ≥500ms to avoid
+            // Minecraft's spam detection ("disconnect.spam" kick).
             console.log('[AgentTesting] Restoring full health and hunger...');
             bot.chat('/effect clear @s');
-            await new Promise(resolve => setTimeout(resolve, 200));
-            // Instant Health amplifier 4 = ~32 HP restored (more than the 20 HP max)
+            await new Promise(resolve => setTimeout(resolve, 500));
             bot.chat('/effect give @s minecraft:instant_health 1 4');
-            await new Promise(resolve => setTimeout(resolve, 200));
-            // Saturation fills the hunger bar; amplifier 255 for 5 seconds saturates fully
+            await new Promise(resolve => setTimeout(resolve, 500));
             bot.chat('/effect give @s minecraft:saturation 5 255');
             await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -245,7 +254,7 @@ export class PluginInstance {
                 console.log(`[AgentTesting] Teleporting to: ${coords.x}, ${y}, ${coords.z}` +
                     (cfg.surface_y != null ? ` (y overridden by world_config.json)` : ''));
                 bot.chat(`/tp @s ${coords.x} ${y} ${coords.z}`);
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1500));
             }
 
             // Give starting inventory items if specified
@@ -255,7 +264,7 @@ export class PluginInstance {
                 for (const [itemName, count] of Object.entries(this.currentTask.starting_inventory)) {
                     console.log(`[AgentTesting] Giving ${count} ${itemName}`);
                     bot.chat(`/give @s minecraft:${itemName} ${count}`);
-                    await new Promise(resolve => setTimeout(resolve, 200));
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
             }
 
@@ -267,7 +276,7 @@ export class PluginInstance {
                 for (const cmd of config.setup_commands) {
                     console.log(`[AgentTesting] Setup command: ${cmd}`);
                     bot.chat(cmd);
-                    await new Promise(resolve => setTimeout(resolve, 200));
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
             }
 
@@ -607,14 +616,33 @@ export class PluginInstance {
             return;
         }
 
+        // Stop any in-flight agent actions (e.g. from init_message) to prevent
+        // concurrent bot.chat() calls that trigger Minecraft's spam filter.
+        await this._quietAgent();
+
         this.batchQueue = [...taskIds];
         this.batchResults = [];
         this.batchStartTime = Date.now();
         this.batchFilter = filter;
+        this.batchTotal = taskIds.length;
 
         console.log(`[AgentTesting] Starting batch: ${taskIds.length} tasks (filter: ${filter})`);
         try { this.agent.bot.chat(`Starting batch test: ${taskIds.length} tasks`); } catch (e) {}
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
         await this._runNextInBatch();
+    }
+
+    async _quietAgent() {
+        try {
+            this.agent.actions.cancelResume();
+            this.agent.actions.stop();
+            if (this.agent.self_prompter.isActive()) {
+                this.agent.self_prompter.stop(false);
+            }
+        } catch (e) { /* best-effort */ }
+        // Let any pending bot.chat() calls drain before we send setup commands
+        await new Promise(resolve => setTimeout(resolve, 1500));
     }
 
     async _runNextInBatch() {
@@ -627,6 +655,10 @@ export class PluginInstance {
         const completed = this.batchResults.length;
         const remaining = this.batchQueue.length;
         console.log(`[AgentTesting] Batch: starting task ${taskId} (${completed + 1}/${completed + remaining + 1})`);
+
+        // Stop any in-flight agent actions from the previous task to prevent
+        // concurrent bot.chat() calls during setupEnvironment().
+        await this._quietAgent();
 
         // Same sequence as !quickTest: load -> setup -> start
         const loaded = await this.loadTaskById(taskId);

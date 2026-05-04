@@ -33,10 +33,10 @@ PROFILES=(
 # Maps each profile path to its profile.name (which is also the bot name and
 # the directory under bots/ where AgentTesting writes test_results/).
 declare -A PROFILE_TO_BOT
-PROFILE_TO_BOT["profiles/experiments/8b_unenhanced.json"]="experiment_baseline"
-PROFILE_TO_BOT["profiles/experiments/8b_softcluster.json"]="experiment_softcluster"
-PROFILE_TO_BOT["profiles/experiments/8b_semantic_only.json"]="experiment_semantic_only"
-PROFILE_TO_BOT["profiles/experiments/frontier_full.json"]="experiment_frontier"
+PROFILE_TO_BOT["profiles/experiments/8b_unenhanced.json"]="exp_baseline"
+PROFILE_TO_BOT["profiles/experiments/8b_softcluster.json"]="exp_softcluster"
+PROFILE_TO_BOT["profiles/experiments/8b_semantic_only.json"]="exp_semantic"
+PROFILE_TO_BOT["profiles/experiments/frontier_full.json"]="exp_frontier"
 
 mkdir -p results
 
@@ -63,10 +63,9 @@ for PROFILE in "${PROFILES[@]}"; do
     AGENT_PID=$!
     echo "Agent PID: ${AGENT_PID}  (logs: results/${PROFILE_NAME}.log)"
 
-    # Wait until a new batch_*.json appears
+    # Wait until a new batch_*.json appears or the agent dies
     echo "Waiting for batch to complete..."
     WAIT_SECONDS=0
-    MAX_WAIT=14400  # 4 hours hard cap
     while true; do
         AFTER_COUNT=0
         if [ -d "$RESULTS_DIR" ]; then
@@ -82,11 +81,6 @@ for PROFILE in "${PROFILES[@]}"; do
         if ! kill -0 "$AGENT_PID" 2>/dev/null; then
             echo "ERROR: Agent process ${AGENT_PID} died before producing a batch result." >&2
             echo "Check results/${PROFILE_NAME}.log for details." >&2
-            break
-        fi
-
-        if [ "$WAIT_SECONDS" -ge "$MAX_WAIT" ]; then
-            echo "ERROR: Timed out waiting for ${PROFILE_NAME} after ${MAX_WAIT}s" >&2
             break
         fi
 

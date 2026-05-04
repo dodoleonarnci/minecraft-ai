@@ -3,8 +3,8 @@
   "description": "Give 3 iron ingots to the nearby player (tests !givePlayer vs hallucinated !give/!drop/!trade)",
   "category": "conversing",
   "survival_critical": false,
-  "goal": "Give 3 iron_ingot to the player named Richard_31415.",
-  "starting_prompt": "The player Richard_31415 is nearby and just asked for 3 iron ingots. You have 5 iron ingots in your inventory. Give exactly 3 iron ingots to Richard_31415 so that you end up with 2 iron ingots remaining.",
+  "goal": "Give 3 iron_ingot to the player named dodoleonarnci.",
+  "starting_prompt": "The player dodoleonarnci is nearby and just asked for 3 iron ingots. You have 5 iron ingots in your inventory. Give exactly 3 iron ingots to dodoleonarnci so that you end up with 2 iron ingots remaining.",
   "starting_inventory": {
     "iron_ingot": 5
   },
